@@ -1,0 +1,42 @@
+.navbar-default .navbar-nav a.active {
+  color: #555 !important;
+  background-color: transparent !important;
+  border-bottom:2px solid #00bdd5 !important;
+}
+
+.eyeoff {
+    display: block;
+    width: 100%;
+    height: 24px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color:#f3f4f6;
+    background-image: url("../images/eyecut.png");
+    background-repeat:no-repeat;
+    background-position: right;
+    border: none;
+    outline:none;
+}
+
+.eyeon {
+    display: block;
+    width: 100%;
+    height: 24px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color:#f3f4f6;
+    background-image: url("../images/eye.jpg");
+    background-repeat:no-repeat;
+    background-position: right;
+    border: none;
+    outline:none;
+}
+
+.tbl {
+  width: 100%;
+  border-collapse: initial;
+}
