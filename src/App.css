@@ -55,3 +55,21 @@
    margin: auto; 
    margin-top: 20%;
 }
+.gauge {
+    position: relative;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+.gauge .info {
+    position: absolute;
+    bottom: 0;
+    text-align: center;
+    margin: auto;
+    width: 100%;
+}
+.gauge .info h5 {
+    text-align: center;
+    font-size: 12px;
+    font-weight: 700;
+    margin-top: 10px;
+}

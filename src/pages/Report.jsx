@@ -2,6 +2,8 @@ import React from 'react';
 import Plot from 'react-plotly.js';
 import { Navbar } from "../components/nav";
 import { GaugeChart } from "../components/GaugeChart";
+import Carousel from "react-multi-carousel";
+import "react-multi-carousel/lib/styles.css";
 
 export const ReportPage = () => {
     var trace1 = {
@@ -50,6 +52,28 @@ export const ReportPage = () => {
     };
 
 
+
+    const responsive = {
+        superLargeDesktop: {
+            // the naming can be any, depends on you.
+            breakpoint: { max: 4000, min: 3000 },
+            items: 5
+        },
+        desktop: {
+            breakpoint: { max: 3000, min: 1024 },
+            items: 3
+        },
+        tablet: {
+            breakpoint: { max: 1024, min: 464 },
+            items: 2
+        },
+        mobile: {
+            breakpoint: { max: 464, min: 0 },
+            items: 1
+        }
+    };
+
+
     return (
         <div className="formbodymain">
             <div className="row">
@@ -88,50 +112,67 @@ export const ReportPage = () => {
                                 </div>
                             </div>
                             <div className="centerwrapperbox ptopten">
-                                <div className="row">
-                                    <div className="col-md-4 col-sm-4 col-xs-12">
-                                        <div className="dbb ttlcent">
-                                            <h2><img src="images/temp.jpg" />Temperature Alert</h2>
-                                            <h3>Kol 1</h3>
-                                            <div className="temp">40<sup>0</sup>C</div>
-                                            <p>Kol 1 has exceed</p>
+                                <h2 className="dev_ttlmain">Device advisories</h2>
+                                    <Carousel
+                                        className="row"
+                                        responsive={responsive}
+                                        showDots={false}
+                                        infinite={true}
+                                        autoPlay={true}
+                                        autoPlaySpeed={1000}
+                                        removeArrowOnDeviceType={["desktop","tablet", "mobile"]}
+                                    >
+                                        <div className="col-md-4 col-sm-4 col-xs-12" style={{"width":"100%"}}>
+                                            <div className="dbb ttlcent">
+                                                <h2><img src="images/temp.jpg" />Temperature Alert</h2>
+                                                <h3>Kol 1</h3>
+                                                <div className="temp">40<sup>0</sup>C</div>
+                                                <p>Kol 1 has exceed</p>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div className="col-md-4 col-sm-4 col-xs-12">
-                                        <div className="dbb ttlcent">
-                                            <h2><img src="images/temp.jpg" />Temperature Alert</h2>
-                                            <h3>Kol 1</h3>
-                                            <div className="temp">40<sup>0</sup>C</div>
-                                            <p>Kol 1 has exceed</p>
+                                        <div className="col-md-4 col-sm-4 col-xs-12" style={{"width":"100%"}}>
+                                            <div className="dbb ttlcent">
+                                                <h2><img src="images/temp.jpg" />Temperature Alert</h2>
+                                                <h3>Kol 1</h3>
+                                                <div className="temp">40<sup>0</sup>C</div>
+                                                <p>Kol 1 has exceed</p>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div className="col-md-4 col-sm-4 col-xs-12">
-                                        <div className="dbb ttlcent">
-                                            <h2><img src="images/temp.jpg" />Temperature Alert</h2>
-                                            <h3>Kol 1</h3>
-                                            <div className="temp">40<sup>0</sup>C</div>
-                                            <p>Kol 1 has exceed</p>
+                                        <div className="col-md-4 col-sm-4 col-xs-12" style={{"width":"100%"}}>
+                                            <div className="dbb ttlcent">
+                                                <h2><img src="images/temp.jpg" />Temperature Alert</h2>
+                                                <h3>Kol 1</h3>
+                                                <div className="temp">40<sup>0</sup>C</div>
+                                                <p>Kol 1 has exceed</p>
+                                            </div>
                                         </div>
-                                    </div>
-                                </div>
+                                        <div className="col-md-4 col-sm-4 col-xs-12" style={{"width":"100%"}}>
+                                            <div className="dbb ttlcent">
+                                                <h2><img src="images/temp.jpg" />Temperature Alert</h2>
+                                                <h3>Kol 1</h3>
+                                                <div className="temp">40<sup>0</sup>C</div>
+                                                <p>Kol 1 has exceed</p>
+                                            </div>
+                                        </div>
+                                    </Carousel>
                             </div>
                             <div className="centerwrapperbox ptopten">
                                 <h2 className="dev_ttlmain">Detailed Analytics</h2>
                                 <div className="row respodr">
                                     <div className="col-md-3 col-sm-2 col-xs-12">
-                                        <div className="dbb boxh onesec" style={{"padding":"10px 15px","height":"260px"}}>
-                                            <h2 className="dev_ttl" style={{"fontSize":"14px"}}>Devices</h2>
-                                            <div className="list" style={{marginTop:"20px"}}>
+                                        <div className="dbb boxh onesec" style={{ "padding": "10px 15px", "height": "260px" }}>
+                                            <h2 className="dev_ttl" style={{ "fontSize": "14px" }}>Devices</h2>
+                                            <div className="list" style={{ marginTop: "20px" }}>
                                                 <ul>
-                                                    <li><input type="checkbox" value="device-1"  checked/> <label>Device 1</label></li>
-                                                    <li><input type="checkbox" value="device-2"  checked/> <label>Device 2</label></li>
-                                                    <li><input type="checkbox" value="device-3"  checked/> <label>Device 3</label></li>
+                                                    <li><input type="checkbox" value="device-1" checked /> <label>Device 1</label></li>
+                                                    <li><input type="checkbox" value="device-2" checked /> <label>Device 2</label></li>
+                                                    <li><input type="checkbox" value="device-3" checked /> <label>Device 3</label></li>
                                                 </ul>
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="col-md-9 col-sm-8 col-xs-12" style={{"paddingRight": "5px"}}>
-                                        <div className="dbb chtbox" style={{"padding":"20px 15px"}}>
+                                    <div className="col-md-9 col-sm-8 col-xs-12" style={{ "paddingRight": "5px" }}>
+                                        <div className="dbb chtbox" style={{ "padding": "20px 15px" }}>
                                             <div className="row">
                                                 <div className="col-md-3 col-sm-3 col-xs-12 chtsel">
                                                     <select name="hourly_filter" id="hourly_filter">
@@ -167,7 +208,7 @@ export const ReportPage = () => {
                                                     displayModeBar: false
                                                 }}
                                                 useResizeHandler={true}
-                                                style={{ width: "100%"}}
+                                                style={{ width: "100%" }}
                                             />
                                         </div>
                                     </div>

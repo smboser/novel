@@ -15,7 +15,9 @@
     "plotly.js": "^2.35.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-gauge-component": "^1.2.51",
     "react-loader-spinner": "^6.1.6",
+    "react-multi-carousel": "^2.8.5",
     "react-plotly.js": "^2.6.0",
     "react-router-dom": "^6.21.2"
   },
