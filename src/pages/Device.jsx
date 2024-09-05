@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { CirclesWithBar } from "react-loader-spinner";
 import { Navbar } from "../components/nav";
 import { DeviceModel } from "../components/device_model";
 import { useAuth } from "../hooks/useAuth";
@@ -6,6 +7,7 @@ import { getDevices } from "../helper/web-service";
 import { differenceDate } from "../helper/utils";
 export const DevicePage = () => {
   const { user } = useAuth();
+  const [isLoaderVisible, setLoaderVisible] = useState(false);
   const [selectedDevice, setSelectedDevice] = useState(null);
   const [selectedDeviceType, setSelectedDeviceType] = useState("");
   const [isOpen, setOpen] = useState(false);
@@ -14,37 +16,46 @@ export const DevicePage = () => {
   const [deviceTypes, setDeviceTypes] = useState([]);
 
   useEffect(() => {
+    setLoaderVisible(true);
     getDevices(user)
       .then((data) => {
-        let devices = data.value;
-        let dTypes = [...new Set(devices.map(device => device.deviceType))];
-        setDevices(devices);
-        setOrgDevices(devices);
-        setDeviceTypes(dTypes);
+          let devices = data.value;
+          let dTypes = [...new Set(devices.map(device => device.deviceType))];
+          setDevices(devices);
+          setOrgDevices(devices);
+          setDeviceTypes(dTypes);
+          setLoaderVisible(false);
       });
   }, []);
 
   const handleChange = (event) => {
-    let type = event.target.value;
-    let deves = orgDevices.filter((device) => {
-      if (type) {
-        return device.deviceType === type;
-      } else {
-        return true;
-      }
-    });
-    setDevices(deves);
-    setSelectedDeviceType(event.target.value);
+        let type = event.target.value;
+        let deves = orgDevices.filter((device) => {
+          if (type) {
+            return device.deviceType === type;
+          } else {
+            return true;
+          }
+        });
+        setDevices(deves);
+        setSelectedDeviceType(event.target.value);
   };
 
   const handleModelClose = (event) => {
-    event.stopPropagation();
-    event.preventDefault();
-    setOpen(false);
+      event.stopPropagation();
+      event.preventDefault();
+      setOpen(false);
   };
 
   return (
     <>
+      <CirclesWithBar
+        color="#00bfff"
+        height="70"
+        width="70"
+        wrapperClass="loader"
+        visible={isLoaderVisible}
+      />
       <div className="formbodymain">
         <div className="row">
           <div className="col-md-12 col-sm-12 col-xs-12">
@@ -117,14 +128,14 @@ export const DevicePage = () => {
           </div>
         </div>
       </div>
-      { 
-         (selectedDevice != null)
-            ? <DeviceModel
-              isOpen={isOpen}
-              closeModel={handleModelClose}
-              device={selectedDevice}
-            />
-           : ""
+      {
+        (selectedDevice != null)
+          ? <DeviceModel
+            isOpen={isOpen}
+            closeModel={handleModelClose}
+            device={selectedDevice}
+          />
+          : ""
       }
     </>
   );
