@@ -1,223 +1,160 @@
 import React from 'react';
-import Plot from 'react-plotly.js';
-import { Navbar } from "../components/nav";
-import { GaugeChart } from "../components/GaugeChart";
-import Carousel from "react-multi-carousel";
+import { useState, useEffect } from "react";
+import { CirclesWithBar } from "react-loader-spinner";
 import "react-multi-carousel/lib/styles.css";
+import { useAuth } from "../hooks/useAuth";
+import { APP_CONST } from "../helper/application-constant";
+import { getSensorData } from "../helper/web-service";
+import { Navbar } from "../components/nav";
+import { AvgParameters } from "../components/avg_parameters";
+import { AlertAdvisories } from "../components/alert_advisories";
+import { DetailedAnalytics } from "../components/detailed_analytics";
 
 export const ReportPage = () => {
-    var trace1 = {
-        x: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-        y: [10, 15, 13, 17, 10, 5, 6],
-        type: 'scatter',
-        marker: {
-            color: 'rgb(219, 64, 82)',
-            size: 5
-        },
-        line: {
-            color: 'rgb(219, 64, 82)',
-            width: 1
-        },
-        name: 'Line 1',
-    };
+    const { user } = useAuth();
+    const [isLoaderVisible, setLoaderVisible] = useState(false);
+    const [series, setSeries] = useState([]);
+    const [parameters, setParameters] = useState(JSON.parse(JSON.stringify(APP_CONST.parameters)));
+    const [last24HourEachDevice, setLast24HourEachDevice] = useState([]);
+    const [devices, setDevices] = useState([]);
+    useEffect(() => {
+        // Showing loader
+        setLoaderVisible(true);
+        // Call API to get sensor data
+        getSensorData(user)
+            .then((data) => {
+                let values = data.value;
+                let sers = [];
+                let devs = [];
+                let lastEachDev = [];
+                let avgpams = [];
 
-    var trace2 = {
-        x: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-        y: [16, 5, 11, 9, 11, 12, 3],
-        type: 'scatter',
-        marker: {
-            color: 'rgb(55, 128, 191)',
-            size: 5
-        },
-        line: {
-            color: 'rgb(55, 128, 191)',
-            width: 1
-        },
-        name: 'Line 2',
-    };
+                // Get series data
+                values.forEach(value => {
+                    let instData = {
+                        "timestamp": value.Timestamp,
+                        "light_level": value.light_level,
+                        "co2": value.co2,
+                        "humidity": value.humidity,
+                        "pressure": value.pressure,
+                        "temperature": value.temperature,
+                        "tvoc": value.tvoc
+                    };
 
-    var trace3 = {
-        x: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-        y: [21, 16, 25, 19, 28, 32, 29],
-        type: 'scatter',
-        marker: {
-            color: 'rgb(255, 217, 102)',
-            size: 5
-        },
-        line: {
-            color: 'rgb(255, 217, 102)',
-            width: 1
-        },
-        name: 'Line 3',
-    };
+                    if (sers.length > 0) {
+                        let index = sers.findIndex(ser => ser.devName === value.devName);
+                        if (index !== -1)
+                            sers[index]["data"].push(instData);
+                        else sers.push({
+                            "devName": value.devName,
+                            "data": [instData]
+                        });
+                    } else {
+                        sers.push({
+                            "devName": value.devName,
+                            "data": [instData]
+                        });
+                    }
 
 
+                    let avgData = {
+                        "devName": value.devName,
+                        "timestamp": value.Timestamp,
+                        "co2": value.co2,
+                        "humidity": value.humidity,
+                        "light_level": value.light_level,
+                        "temperature": value.temperature,
+                        "tvoc": value.tvoc
+                    };
 
-    const responsive = {
-        superLargeDesktop: {
-            // the naming can be any, depends on you.
-            breakpoint: { max: 4000, min: 3000 },
-            items: 5
-        },
-        desktop: {
-            breakpoint: { max: 3000, min: 1024 },
-            items: 3
-        },
-        tablet: {
-            breakpoint: { max: 1024, min: 464 },
-            items: 2
-        },
-        mobile: {
-            breakpoint: { max: 464, min: 0 },
-            items: 1
-        }
-    };
+                    if (lastEachDev.length > 0) {
+                        let index = lastEachDev.findIndex(device => device.devName === value.devName);
+                        if (index !== -1) {
+                            let d1 = new Date(lastEachDev[index]['timestamp']);
+                            let d2 = new Date(value.Timestamp);
+                            if (d2.getTime() > d1.getTime()) {
+                                lastEachDev[index] = avgData;
+                            }
+                        } else lastEachDev.push(avgData);
+                    } else {
+                        lastEachDev.push(avgData);
+                    }
+                });
+
+                // Find the unique devices
+                devs = [...new Set(sers.map(ser => ser.devName))];
+
+                setDevices(devs);
+                setSeries(sers);
+                setLast24HourEachDevice(lastEachDev);
+                setLoaderVisible(false);
+            });
+    }, []);
 
 
     return (
-        <div className="formbodymain">
-            <div className="row">
-                <div className="col-md-12 col-sm-12 col-xs-12">
-                    <Navbar />
-                </div>
-                <div className="col-md-12 col-sm-12 col-xs-12 report" id="style-3">
-                    <div className="x_panel">
-                        <div className="col-md-12 col-sm-12 col-xs-12">
-                            <div className="ttl_main center">
-                                <h2 style={{ textAlign: "center" }}>Device Data</h2>
-                            </div>
-                            <div className="row">
-                                <div className="col-md-12 col-sm-12 col-xs-12">
-                                    <div className="centerwrapperbox">
-                                        <h2 className="dev_ttlmain">All devices average</h2>
-                                    </div>
+        <>
+            <CirclesWithBar
+                color="#00bfff"
+                height="70"
+                width="70"
+                wrapperClass="loader"
+                visible={isLoaderVisible}
+            />
+            <div className="formbodymain">
+                <div className="row">
+                    <div className="col-md-12 col-sm-12 col-xs-12">
+                        <Navbar />
+                    </div>
+                    <div className="col-md-12 col-sm-12 col-xs-12 report" id="style-3">
+                        <div className="x_panel">
+                            <div className="col-md-12 col-sm-12 col-xs-12">
+                                <div className="ttl_main center">
+                                    <h2 style={{ textAlign: "center" }}>Device Data</h2>
                                 </div>
-                            </div>
-                            <div className="centerwrapperbox">
-                                <div className="chartbox dbb">
-                                    <div className="row">
-                                        <div className="col-md-3 col-sm-6 col-xs-12">
-                                            <GaugeChart title="Temperature" />
-                                        </div>
-                                        <div className="col-md-3 col-sm-6 col-xs-12">
-                                            <GaugeChart title="Humidity" />
-                                        </div>
-                                        <div className="col-md-3 col-sm-6 col-xs-12">
-                                            <GaugeChart title="CO2" />
-                                        </div>
-                                        <div className="col-md-3 col-sm-6 col-xs-12">
-                                            <GaugeChart title="TVOC" />
+                                <div className="row">
+                                    <div className="col-md-12 col-sm-12 col-xs-12">
+                                        <div className="centerwrapperbox">
+                                            <h2 className="dev_ttlmain">All devices data average for last 24 hours</h2>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div className="centerwrapperbox ptopten">
-                                <h2 className="dev_ttlmain">Device advisories</h2>
-                                    <Carousel
-                                        className="row"
-                                        responsive={responsive}
-                                        showDots={false}
-                                        infinite={true}
-                                        autoPlay={true}
-                                        autoPlaySpeed={1000}
-                                        removeArrowOnDeviceType={["desktop","tablet", "mobile"]}
-                                    >
-                                        <div className="col-md-4 col-sm-4 col-xs-12" style={{"width":"100%"}}>
-                                            <div className="dbb ttlcent">
-                                                <h2><img src="images/temp.jpg" />Temperature Alert</h2>
-                                                <h3>Kol 1</h3>
-                                                <div className="temp">40<sup>0</sup>C</div>
-                                                <p>Kol 1 has exceed</p>
-                                            </div>
-                                        </div>
-                                        <div className="col-md-4 col-sm-4 col-xs-12" style={{"width":"100%"}}>
-                                            <div className="dbb ttlcent">
-                                                <h2><img src="images/temp.jpg" />Temperature Alert</h2>
-                                                <h3>Kol 1</h3>
-                                                <div className="temp">40<sup>0</sup>C</div>
-                                                <p>Kol 1 has exceed</p>
-                                            </div>
-                                        </div>
-                                        <div className="col-md-4 col-sm-4 col-xs-12" style={{"width":"100%"}}>
-                                            <div className="dbb ttlcent">
-                                                <h2><img src="images/temp.jpg" />Temperature Alert</h2>
-                                                <h3>Kol 1</h3>
-                                                <div className="temp">40<sup>0</sup>C</div>
-                                                <p>Kol 1 has exceed</p>
-                                            </div>
-                                        </div>
-                                        <div className="col-md-4 col-sm-4 col-xs-12" style={{"width":"100%"}}>
-                                            <div className="dbb ttlcent">
-                                                <h2><img src="images/temp.jpg" />Temperature Alert</h2>
-                                                <h3>Kol 1</h3>
-                                                <div className="temp">40<sup>0</sup>C</div>
-                                                <p>Kol 1 has exceed</p>
-                                            </div>
-                                        </div>
-                                    </Carousel>
-                            </div>
-                            <div className="centerwrapperbox ptopten">
-                                <h2 className="dev_ttlmain">Detailed Analytics</h2>
-                                <div className="row respodr">
-                                    <div className="col-md-3 col-sm-2 col-xs-12">
-                                        <div className="dbb boxh onesec" style={{ "padding": "10px 15px", "height": "260px" }}>
-                                            <h2 className="dev_ttl" style={{ "fontSize": "14px" }}>Devices</h2>
-                                            <div className="list" style={{ marginTop: "20px" }}>
-                                                <ul>
-                                                    <li><input type="checkbox" value="device-1" checked /> <label>Device 1</label></li>
-                                                    <li><input type="checkbox" value="device-2" checked /> <label>Device 2</label></li>
-                                                    <li><input type="checkbox" value="device-3" checked /> <label>Device 3</label></li>
-                                                </ul>
-                                            </div>
-                                        </div>
+                                <div className="centerwrapperbox">
+                                    <div className="chartbox dbb">
+                                        {
+                                            (last24HourEachDevice.length > 0)
+                                                ?
+                                                <AvgParameters
+                                                    parameters={parameters}
+                                                    last24HoursData={last24HourEachDevice}
+                                                />
+                                                : "Waiting to load data...."
+                                        }
                                     </div>
-                                    <div className="col-md-9 col-sm-8 col-xs-12" style={{ "paddingRight": "5px" }}>
-                                        <div className="dbb chtbox" style={{ "padding": "20px 15px" }}>
-                                            <div className="row">
-                                                <div className="col-md-3 col-sm-3 col-xs-12 chtsel">
-                                                    <select name="hourly_filter" id="hourly_filter">
-                                                        <option value="volvo">Last hour</option>
-                                                        <option value="volvo">Last 12 hours</option>
-                                                        <option value="volvo">Last 24 hours</option>
-                                                        <option value="volvo">Last 48 hours</option>
-                                                        <option value="volvo">Last Week</option>
-                                                    </select>
-                                                </div>
-                                                <div className="col-md-3 col-sm-3 col-xs-12 chtsel">
-                                                    <select name="type_filter" id="type_filter">
-                                                        <option value="temperature">Temperature</option>
-                                                        <option value="humidity">Humidity</option>
-                                                        <option value="co2">CO2</option>
-                                                        <option value="co2">TVOC</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <Plot
-                                                data={[trace1, trace2, trace1, trace3]}
-                                                layout={{
-                                                    height: 200,
-                                                    margin: {
-                                                        l: 30,
-                                                        r: 30,
-                                                        b: 30,
-                                                        t: 30,
-                                                        pad: 5
-                                                    }
-                                                }}
-                                                config={{
-                                                    displayModeBar: false
-                                                }}
-                                                useResizeHandler={true}
-                                                style={{ width: "100%" }}
-                                            />
-                                        </div>
-                                    </div>
+                                </div>
+                                <div className="centerwrapperbox ptopten">
+                                    <h2 className="dev_ttlmain">Device advisories</h2>
+                                    <AlertAdvisories></AlertAdvisories>
+                                </div>
+                                <div className="centerwrapperbox ptopten">
+                                    <h2 className="dev_ttlmain">Detailed Analytics</h2>
+                                    {
+                                        (series.length > 0)
+                                            ?
+                                            <DetailedAnalytics
+                                                devices={devices}
+                                                parameters={parameters}
+                                                series={series}
+                                                default_parameter={APP_CONST.default_parameter}
+                                            ></DetailedAnalytics>
+                                            : "Waiting to load data...."
+                                    }
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </>
     );
 };

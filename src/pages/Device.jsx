@@ -98,10 +98,11 @@ export const DevicePage = () => {
                   </thead>
                   <tbody>
                     {devices.map((device, i) => {
+                      let delta = differenceDate(new Date(device.lastUpdate), new Date());
                       return (
                         <tr key={i}>
                           <td><img src="images/dicon.png" /> {device.devName}</td>
-                          <td>{device.lastUpdate}</td>
+                          <td>{delta}</td>
                           <td>{device.deviceType}</td>
                           <th>
                             <img src="images/eye.jpg" data-device={JSON.stringify(device)} onClick={(event) => {

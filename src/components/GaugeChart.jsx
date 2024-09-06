@@ -1,6 +1,11 @@
 import React from 'react';
 import { GaugeComponent } from 'react-gauge-component';
-export const GaugeChart = ({ title }) => {
+export const GaugeChart = ({ param, last24HoursData }) => {
+    let total = last24HoursData.reduce((accumulator, current) => {
+        let curval = (current[param.key]) ? current[param.key] : 0
+        return accumulator + curval;
+    }, 0);
+    let avg = Math.floor(total / last24HoursData.length);
     return (
         <div className="gauge">
             <GaugeComponent
@@ -11,7 +16,7 @@ export const GaugeChart = ({ title }) => {
                     cornerRadius: 1,
                     subArcs: [
                         {
-                            limit: 70,
+                            limit: param.upper_limit_value,
                             color: '#5BE12C',
                             showTick: false
                         },
@@ -27,12 +32,13 @@ export const GaugeChart = ({ title }) => {
                     width: 10,
                 }}
                 labels={{
-                    valueLabel: { 
+                    valueLabel: {
                         formatTextValue: value => value,
                         style: {
-                            fontSize: "35px", 
-                            fill: "red", 
-                            textShadow: "red 1px 1px 0px, red 0px 0px 2.5em, red 0px 0px 0.2em"}
+                            fontSize: "35px",
+                            fill: "red",
+                            textShadow: "red 1px 1px 0px, red 0px 0px 2.5em, red 0px 0px 0.2em"
+                        }
                     },
                     tickLabels: {
                         type: 'outer',
@@ -44,12 +50,12 @@ export const GaugeChart = ({ title }) => {
                         ],
                     }
                 }}
-                value={32}
-                minValue={0}
-                maxValue={100}
+                value={avg}
+                minValue={param.min_value}
+                maxValue={param.max_value}
             />
             <div className="info">
-                <h5>{title}</h5>
+                <h5>{param.name}</h5>
             </div>
         </div>
     );
