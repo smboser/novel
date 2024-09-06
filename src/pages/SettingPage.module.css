@@ -1,0 +1,41 @@
+.formbodymain {
+  /* Styles for the main container */
+}
+
+.x_content {
+  max-height: 400px;
+  overflow-y: scroll;
+}
+
+.x_panel {
+  /* Styles for the panel */
+}
+
+.ttl_main {
+  /* Styles for the title section */
+}
+
+.table th,
+.table td,
+.table tr {
+  vertical-align: middle !important;
+}
+
+.table td span {
+  line-height: 100% !important;
+}
+.table td input,
+.save_btn {
+  font-size: 1.4em !important;
+  width: 100px;
+}
+.succ_msg {
+  color: green;
+  padding-left: 10px;
+  font-size: 0.8em;
+}
+.err_msg {
+  color: red;
+  padding-left: 10px;
+  font-size: 0.8em;
+}
