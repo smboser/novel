@@ -3,51 +3,61 @@ import Plot from 'react-plotly.js';
 import moment from 'moment';
 import { useState, useEffect } from "react";
 
-export const DetailedAnalytics = ({ devices, parameters, series, default_parameter }) => {
-    const [selectedDevices, setSelectedDevices] = useState(devices);
-    const [selectedParam, setSelectedParam] = useState(default_parameter);
-    const [serData, setSerData] = useState([]);
-    useEffect(() => {
-        let sd = [];
-        series.forEach(ser => {
-            let xArr = [];
-            let yArr = [];
-            ser.data.forEach(s => {
+export const DetailedAnalytics = ({ devices, parameters, series, selectedHourly, selectedParam, setDevices, setSelectedHourly, setSelectedParam }) => {
+
+    const handleHourlyFilterChange = (event) => {
+        console.log("--- Inside handleHourlyFilterChange ---");
+        setSelectedHourly(event.target.value);
+    };
+
+    const handleParamFilterChange = (event) => {
+        console.log("--- Inside handleParamFilterChange ---")
+        setSelectedParam(event.target.value);
+    };
+
+    let pdt = moment().add(-1, 'hours');
+    switch (selectedHourly) {
+        case "last_hour":
+            pdt = moment().add(-1, 'hours');
+            break;
+        case "last_12_hour":
+            pdt = moment().add(-12, 'hours');
+            break;
+        case "last_24_hour":
+            pdt = moment().add(-24, 'hours');
+            break;
+        case "last_48_hour":
+            pdt = moment().add(-48, 'hours');
+            break;
+        case "last_week":
+            pdt = moment().add(-1, 'weeks');
+            break;
+    }
+
+    let sd = [];
+    series.forEach(ser => {
+        let xArr = [];
+        let yArr = [];
+        ser.data.forEach(s => {
+            let cdt = moment(s.timestamp);
+            if(cdt.diff(pdt, 'seconds') > 0) {
                 xArr.push(moment(s.timestamp).format('YYYY-MM-DD h:mm:ss'));
                 yArr.push(s[selectedParam]);
-            });
-            sd.push({
-                x: xArr,
-                y: yArr,
-                type: 'scatter',
-                marker: {
-                    size: 5
-                },
-                line: {
-                    width: 1
-                },
-                name: ser.devName,
-            });
+            }
         });
-        console.log(sd);
-        setSerData(sd);
-    }, []);
-
-
-    const handleCheckboxChange = (event) => {
-        event.stopPropagation();
-        event.preventDefault();
-        let deves = selectedDevices;
-        let dev = event.target.value;
-        debugger;
-        if(deves.includes(dev)) {
-            let index = deves.indexOf(dev);
-            deves.splice(index, 1);
-        } else {
-            deves.push(dev);
-        }
-        setSelectedDevices(deves);
-    };
+        sd.push({
+            x: xArr,
+            y: yArr,
+            type: 'scatter',
+            marker: {
+                size: 5
+            },
+            line: {
+                width: 1
+            },
+            name: ser.devName,
+        });
+    });
 
     return (
         <div className="row respodr">
@@ -56,14 +66,13 @@ export const DetailedAnalytics = ({ devices, parameters, series, default_paramet
                     <h2 className="dev_ttl" style={{ "fontSize": "14px" }}>Devices</h2>
                     <div className="list" style={{ marginTop: "20px" }}>
                         <ul>
-                            {selectedDevices.map((device, i) => {
+                            {devices.map((device, i) => {
                                 return (
                                     <li key={i}>
                                         <input
                                             type="checkbox"
-                                            value={device}
-                                            defaultChecked={(selectedDevices.includes(device))}
-                                            onChange={handleCheckboxChange}
+                                            value={device.name}
+                                            defaultChecked={true}
                                         />
                                         <label>{device}</label>
                                     </li>
@@ -77,7 +86,10 @@ export const DetailedAnalytics = ({ devices, parameters, series, default_paramet
                 <div className="dbb chtbox" style={{ "padding": "20px 15px" }}>
                     <div className="row">
                         <div className="col-md-3 col-sm-3 col-xs-12 chtsel">
-                            <select name="hourly_filter" id="hourly_filter">
+                            <select
+                                name="hourly_filter"
+                                value={selectedHourly}
+                                onChange={handleHourlyFilterChange}>
                                 <option value="last_hour">Last hour</option>
                                 <option value="last_12_hour">Last 12 hours</option>
                                 <option value="last_24_hour">Last 24 hours</option>
@@ -86,7 +98,10 @@ export const DetailedAnalytics = ({ devices, parameters, series, default_paramet
                             </select>
                         </div>
                         <div className="col-md-3 col-sm-3 col-xs-12 chtsel">
-                            <select name="type_filter" id="type_filter">
+                            <select
+                                name="type_filter"
+                                value={selectedParam}
+                                onChange={handleParamFilterChange}>
                                 {parameters.map((parameter, i) => {
                                     return (
                                         <option key={i} value={parameter.key}>{parameter.name}</option>
@@ -96,15 +111,18 @@ export const DetailedAnalytics = ({ devices, parameters, series, default_paramet
                         </div>
                     </div>
                     <Plot
-                        data={serData}
+                        data={sd}
                         layout={{
-                            height: 200,
+                            height: 300,
                             margin: {
                                 l: 30,
                                 r: 30,
                                 b: 30,
                                 t: 30,
                                 pad: 5
+                            },
+                            xaxis: {
+                                automargin: true
                             }
                         }}
                         config={{
