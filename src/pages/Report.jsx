@@ -17,6 +17,9 @@ export const ReportPage = () => {
     const [parameters, setParameters] = useState(JSON.parse(JSON.stringify(APP_CONST.parameters)));
     const [last24HourEachDevice, setLast24HourEachDevice] = useState([]);
     const [devices, setDevices] = useState([]);
+    const [selectedHourly, setSelectedHourly] = useState("last_hour");
+    const [selectedParam, setSelectedParam] = useState(APP_CONST.default_parameter);
+
     useEffect(() => {
         // Showing loader
         setLoaderVisible(true);
@@ -27,7 +30,6 @@ export const ReportPage = () => {
                 let sers = [];
                 let devs = [];
                 let lastEachDev = [];
-                let avgpams = [];
 
                 // Get series data
                 values.forEach(value => {
@@ -81,9 +83,12 @@ export const ReportPage = () => {
                     }
                 });
 
+                // Sorting serices
+                sers = sers.sort(function (a, b) {
+                    return new Date(b.timestamp) - new Date(a.timestamp);
+                });
                 // Find the unique devices
                 devs = [...new Set(sers.map(ser => ser.devName))];
-
                 setDevices(devs);
                 setSeries(sers);
                 setLast24HourEachDevice(lastEachDev);
@@ -145,7 +150,11 @@ export const ReportPage = () => {
                                                 devices={devices}
                                                 parameters={parameters}
                                                 series={series}
-                                                default_parameter={APP_CONST.default_parameter}
+                                                selectedHourly={selectedHourly}
+                                                selectedParam={selectedParam}
+                                                setDevices={setDevices}
+                                                setSelectedHourly={setSelectedHourly}
+                                                setSelectedParam={setSelectedParam}
                                             ></DetailedAnalytics>
                                             : "Waiting to load data...."
                                     }
