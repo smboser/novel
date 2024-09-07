@@ -5,8 +5,9 @@ import { useState, useEffect } from "react";
 import { debounce } from '@mui/material';
 
 export const DetailedAnalytics = ({ devices, parameters, series, selectedHourly, selectedParam, setSelectedHourly, setSelectedParam }) => {
-    const [deviceList, setDeviceList] = useState([]);
+    const [selectedDevices, setSelectedDevices] = useState([]);
     const [organizedSerieData, setOrganizedSerieData] = useState([]);
+
 
 
     const detailedAnalyticsData = () => {
@@ -40,7 +41,7 @@ export const DetailedAnalytics = ({ devices, parameters, series, selectedHourly,
                     yArr.push(yval);
                 }
             });
-            if (xArr.length > 0 && yArr.length > 0) {
+            if (xArr.length > 0 && yArr.length > 0 && selectedDevices.includes(ser.devName)) {
                 sd.push({
                     x: xArr,
                     y: yArr,
@@ -60,25 +61,26 @@ export const DetailedAnalytics = ({ devices, parameters, series, selectedHourly,
 
     useEffect(() => {
         console.log(`Inside useEffect for  DetailedAnalytics`);
-        let devList = devices.map((dev)=>{ return {"devName": dev, isChecked: true}});
-        setDeviceList(devList);
+        setSelectedDevices(devices);
         detailedAnalyticsData();
     }, []);
 
     useEffect(() => {
         console.log(`Inside useEffect for  DetailedAnalytics`);
         detailedAnalyticsData();
-    }, [selectedHourly,selectedParam, deviceList]);
+    }, [selectedHourly, selectedParam, selectedDevices]);
 
     const handleCheckboxChange = (event) => {
         event.stopPropagation();
         event.preventDefault();
         console.log("--- Inside handleCheckboxChange ---");
-        debugger
         let value = event.target.value;
-        let index = deviceList.findIndex(device => device.devName === value);
-        deviceList[index]["isChecked"] = !deviceList[index]["isChecked"];
-        setDeviceList(deviceList);
+        let isChecked = event.target.checked;
+        if (isChecked) {
+            setSelectedDevices([...selectedDevices, value]);
+        } else {
+            setSelectedDevices(selectedDevices.filter((id) => id !== value));
+        }
     };
 
     const handleHourlyFilterChange = (event) => {
@@ -92,9 +94,9 @@ export const DetailedAnalytics = ({ devices, parameters, series, selectedHourly,
     };
 
 
+console.log("selectedDevices");
 
-
-
+console.log(selectedDevices);
     return (
         <div className="row respodr">
             <div className="col-md-3 col-sm-2 col-xs-12">
@@ -102,18 +104,18 @@ export const DetailedAnalytics = ({ devices, parameters, series, selectedHourly,
                     <h2 className="dev_ttl" style={{ "fontSize": "14px" }}>Devices</h2>
                     <div className="list" style={{ marginTop: "20px" }}>
                         <ul>
-                            {deviceList.map((device, i) => {
+                            {devices.map((device, i) => {
                                 return (
                                     <li key={i}>
                                         <input
                                             type="checkbox"
                                             id={`custom-checkbox-${i}`}
-                                            name={device.devName}
-                                            value={device.devName}
-                                            checked={device.isChecked}
+                                            name={device}
+                                            value={device}
+                                            checked={selectedDevices.includes(device)}
                                             onChange={handleCheckboxChange}
                                         />
-                                        <label>{device.devName}</label>
+                                        <label>{device}</label>
                                     </li>
                                 )
                             })}
