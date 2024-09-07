@@ -3,6 +3,7 @@ import { LoginPage } from "./pages/Login";
 import { DevicePage } from "./pages/Device";
 import { ReportPage } from "./pages/Report";
 import { SettingPage } from "./pages/Setting";
+import { SurveyPage } from "./pages/SurveyPage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AuthProvider } from "./hooks/useAuth";
 import "./App.css";
@@ -32,6 +33,14 @@ function App() {
           element={
             <ProtectedRoute>
               <SettingPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/survey"
+          element={
+            <ProtectedRoute>
+              <SurveyPage />
             </ProtectedRoute>
           }
         />

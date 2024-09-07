@@ -5,6 +5,7 @@ import { InputAdornment, OutlinedInput, Button } from "@mui/material";
 import { ErrorOutline } from "@mui/icons-material";
 import { useQuery } from "react-query";
 import axios from "axios";
+import { filterLatestAlerts } from "../helper/utils";
 import {
   setAdvisorySettings,
   getAdvisorySettings,
@@ -33,7 +34,8 @@ export const SettingPage = () => {
   // Update state when data is fetched
   useEffect(() => {
     if (data) {
-      const organizedData = data.reduce((acc, alert) => {
+      const modifiedData = filterLatestAlerts(data);
+      const organizedData = modifiedData.reduce((acc, alert) => {
         if (!acc[alert.paramDisplayName]) {
           acc[alert.paramDisplayName] = {
             lt: "",
@@ -68,19 +70,29 @@ export const SettingPage = () => {
   const handleSave = async () => {
     setLoaderVisible(true);
     const apiSaveUrl = setAdvisorySettings(user);
-    // const apiUrl =
-    //   "https://prod-26.australiaeast.logic.azure.com:443/workflows/3c179ff0e6064518b5750820cac3e7a8/triggers/When_a_HTTP_request_is_received/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_a_HTTP_request_is_received%2Frun&sv=1.0&sig=ZjmaeAOmkBUJb0a5KEXPL4n7bCp9W_doTwMsvTK987c&authToken=" +
-    //   user.token;
 
     try {
       const filteredSettings = settings
-        .map(({ parameter, lt, gt, active, orgName }) => ({
-          active,
-          func: lt ? "lt" : gt ? "gt" : null,
-          level: lt ? Number(lt) : gt ? Number(gt) : null,
-          orgName,
-          parameter,
-        }))
+        .map(({ parameter, lt, gt, active, orgName }) => {
+          // Include both lt and gt values if they exist
+          const result = {
+            active,
+            parameter,
+            orgName,
+          };
+
+          if (lt) {
+            result.func = "lt";
+            result.level = Number(lt);
+          }
+
+          if (gt) {
+            result.func = "gt";
+            result.level = Number(gt);
+          }
+
+          return result;
+        })
         .filter(({ func, level }) => func && !isNaN(level));
 
       if (filteredSettings.length === 0) {

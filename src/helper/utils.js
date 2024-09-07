@@ -1,37 +1,74 @@
 export function differenceDate(date_past, date_now) {
-        let date_past_time = date_past.getTime();
-        let date_now_time  = date_now.getTime();
+  let date_past_time = date_past.getTime();
+  let date_now_time = date_now.getTime();
 
-        var delta = Math.abs(date_now_time - date_past_time) / 1000;
+  var delta = Math.abs(date_now_time - date_past_time) / 1000;
 
-        // calculate (and subtract) whole days
-        let days = Math.floor(delta / 86400);
-        delta -= days * 86400;
+  // calculate (and subtract) whole days
+  let days = Math.floor(delta / 86400);
+  delta -= days * 86400;
 
-        // calculate (and subtract) whole hours
-        let hours = Math.floor(delta / 3600) % 24;
-        delta -= hours * 3600;
+  // calculate (and subtract) whole hours
+  let hours = Math.floor(delta / 3600) % 24;
+  delta -= hours * 3600;
 
-        // calculate (and subtract) whole minutes
-        let minutes = Math.floor(delta / 60) % 60;
-        delta -= minutes * 60;
+  // calculate (and subtract) whole minutes
+  let minutes = Math.floor(delta / 60) % 60;
+  delta -= minutes * 60;
 
-        // what's left is seconds
-        let seconds = Math.floor(delta % 60);
+  // what's left is seconds
+  let seconds = Math.floor(delta % 60);
 
-        let diff = "";
-        if(days > 0) {
-            diff = `${days}D`
-        }
-        if(hours > 0) {
-            diff = `${diff} ${hours}H`
-        }
-        if(minutes > 0) {
-            diff = `${diff} ${minutes}M`
-        }
-        if(seconds > 0) {
-            diff = `${diff} ${seconds}S`
-        }
-        return diff;
-
+  let diff = "";
+  if (days > 0) {
+    diff = `${days}D`;
+  }
+  if (hours > 0) {
+    diff = `${diff} ${hours}H`;
+  }
+  if (minutes > 0) {
+    diff = `${diff} ${minutes}M`;
+  }
+  if (seconds > 0) {
+    diff = `${diff} ${seconds}S`;
+  }
+  return diff;
 }
+
+export const filterLatestAlerts = (data) => {
+  // Create a map to group entries by parameter and func
+  const latestEntries = data.reduce((acc, item) => {
+    const { parameter, func, Timestamp } = item;
+
+    if (!acc[parameter]) {
+      acc[parameter] = { lt: null, gt: null };
+    }
+
+    if (func === "lt") {
+      // Update the 'lt' entry if it's the latest one
+      if (
+        !acc[parameter].lt ||
+        new Date(Timestamp) > new Date(acc[parameter].lt.Timestamp)
+      ) {
+        acc[parameter].lt = item;
+      }
+    } else if (func === "gt") {
+      // Update the 'gt' entry if it's the latest one
+      if (
+        !acc[parameter].gt ||
+        new Date(Timestamp) > new Date(acc[parameter].gt.Timestamp)
+      ) {
+        acc[parameter].gt = item;
+      }
+    }
+
+    return acc;
+  }, {});
+
+  // Convert the result to an array if needed
+  const filteredData = Object.values(latestEntries).flatMap(({ lt, gt }) =>
+    [lt, gt].filter(Boolean)
+  );
+
+  return filteredData;
+};
