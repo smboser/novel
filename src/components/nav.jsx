@@ -1,5 +1,7 @@
 import { NavLink } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
 export const Navbar = () => {
+  const { user } = useAuth();
   return (
     <nav className="navbar navbar-default">
       <div className="container-fluid">

@@ -10,40 +10,72 @@ export const APP_CONST = {
             "key": "temperature",
             "avg_value": 0,
             "min_value": 0,
-            "upper_limit_value": 45,
-            "max_value": 60
+            "max_value": 60,
+            "unit":"°C"
         },
         {
             "name": "Humidity",
             "key": "humidity",
             "avg_value": 0,
             "min_value": 0,
-            "upper_limit_value": 45,
-            "max_value": 100
+            "max_value": 100,
+            "unit":"%"
         },
         {
             "name": "CO2",
             "key": "co2",
             "avg_value": 0,
             "min_value": 0,
-            "upper_limit_value": 6000,
-            "max_value": 10000
+            "max_value": 10000,
+            "unit":"%"
         },
         {
             "name": "TVOC",
             "key": "tvoc",
             "avg_value": 0,
             "min_value": 0,
-            "upper_limit_value": 80,
-            "max_value": 100
+            "max_value": 100,
+            "unit":"%"
         },
         {
             "name": "Light",
             "key": "light_level",
             "avg_value": 0,
             "min_value": 0,
-            "upper_limit_value": 3,
-            "max_value": 8
+            "max_value": 8,
+            "unit":""
+        },
+        {
+            "name": "Battery",
+            "key": "battery",
+            "avg_value": 0,
+            "min_value": 0,
+            "max_value": 100,
+            "unit":""
+        },
+        {
+            "name": "pm2_5",
+            "key": "pm2_5",
+            "avg_value": 0,
+            "min_value": 0,
+            "max_value": 27,
+            "unit":""
+        },
+        {
+            "name": "pm10",
+            "key": "pm10",
+            "avg_value": 0,
+            "min_value": 0,
+            "max_value": 27,
+            "unit":""
+        },
+        {
+            "name": "Pressure",
+            "key": "pressure",
+            "avg_value": 0,
+            "min_value": 0,
+            "max_value": 1000,
+            "unit":"Pa"
         }
     ]
 };

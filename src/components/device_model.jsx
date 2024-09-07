@@ -1,4 +1,6 @@
 import { useState } from "react";
+import * as MaterialDesign from "react-icons/md";
+
 export const DeviceModel = ({ isOpen, closeModel, device }) => {
     return (
         <>
@@ -10,7 +12,7 @@ export const DeviceModel = ({ isOpen, closeModel, device }) => {
                                 <span aria-hidden="true">&times;</span>
                             </button>
                             <h5 className="modal-title" id="myModalLabel">
-                                <img src="images/dicon.png" /> {device.devName}
+                                <MaterialDesign.MdAir color="#00bdd5" size={20} /> {device.devName}
                             </h5>
                         </div>
                         <div className="modal-body">

@@ -2,8 +2,84 @@ import React from 'react';
 import Plot from 'react-plotly.js';
 import moment from 'moment';
 import { useState, useEffect } from "react";
+import { debounce } from '@mui/material';
 
-export const DetailedAnalytics = ({ devices, parameters, series, selectedHourly, selectedParam, setDevices, setSelectedHourly, setSelectedParam }) => {
+export const DetailedAnalytics = ({ devices, parameters, series, selectedHourly, selectedParam, setSelectedHourly, setSelectedParam }) => {
+    const [deviceList, setDeviceList] = useState([]);
+    const [organizedSerieData, setOrganizedSerieData] = useState([]);
+
+
+    const detailedAnalyticsData = () => {
+        let pdt = moment().add(-1, 'hours');
+        switch (selectedHourly) {
+            case "last_hour":
+                pdt = moment().add(-1, 'hours');
+                break;
+            case "last_12_hour":
+                pdt = moment().add(-12, 'hours');
+                break;
+            case "last_24_hour":
+                pdt = moment().add(-24, 'hours');
+                break;
+            case "last_48_hour":
+                pdt = moment().add(-48, 'hours');
+                break;
+            case "last_week":
+                pdt = moment().add(-1, 'weeks');
+                break;
+        }
+        let sd = [];
+        series.forEach(ser => {
+            let xArr = [];
+            let yArr = [];
+            ser.data.forEach(s => {
+                let cdt = moment(s.timestamp);
+                let yval = s[selectedParam];
+                if (cdt.diff(pdt, 'seconds') > 0 && yval) {
+                    xArr.push(moment(s.timestamp).format('YYYY-MM-DD H:mm:ss'));
+                    yArr.push(yval);
+                }
+            });
+            if (xArr.length > 0 && yArr.length > 0) {
+                sd.push({
+                    x: xArr,
+                    y: yArr,
+                    type: 'scatter',
+                    marker: {
+                        size: 5
+                    },
+                    line: {
+                        width: 1
+                    },
+                    name: ser.devName,
+                });
+            }
+        });
+        setOrganizedSerieData(sd);
+    };
+
+    useEffect(() => {
+        console.log(`Inside useEffect for  DetailedAnalytics`);
+        let devList = devices.map((dev)=>{ return {"devName": dev, isChecked: true}});
+        setDeviceList(devList);
+        detailedAnalyticsData();
+    }, []);
+
+    useEffect(() => {
+        console.log(`Inside useEffect for  DetailedAnalytics`);
+        detailedAnalyticsData();
+    }, [selectedHourly,selectedParam, deviceList]);
+
+    const handleCheckboxChange = (event) => {
+        event.stopPropagation();
+        event.preventDefault();
+        console.log("--- Inside handleCheckboxChange ---");
+        debugger
+        let value = event.target.value;
+        let index = deviceList.findIndex(device => device.devName === value);
+        deviceList[index]["isChecked"] = !deviceList[index]["isChecked"];
+        setDeviceList(deviceList);
+    };
 
     const handleHourlyFilterChange = (event) => {
         console.log("--- Inside handleHourlyFilterChange ---");
@@ -15,49 +91,9 @@ export const DetailedAnalytics = ({ devices, parameters, series, selectedHourly,
         setSelectedParam(event.target.value);
     };
 
-    let pdt = moment().add(-1, 'hours');
-    switch (selectedHourly) {
-        case "last_hour":
-            pdt = moment().add(-1, 'hours');
-            break;
-        case "last_12_hour":
-            pdt = moment().add(-12, 'hours');
-            break;
-        case "last_24_hour":
-            pdt = moment().add(-24, 'hours');
-            break;
-        case "last_48_hour":
-            pdt = moment().add(-48, 'hours');
-            break;
-        case "last_week":
-            pdt = moment().add(-1, 'weeks');
-            break;
-    }
 
-    let sd = [];
-    series.forEach(ser => {
-        let xArr = [];
-        let yArr = [];
-        ser.data.forEach(s => {
-            let cdt = moment(s.timestamp);
-            if(cdt.diff(pdt, 'seconds') > 0) {
-                xArr.push(moment(s.timestamp).format('YYYY-MM-DD h:mm:ss'));
-                yArr.push(s[selectedParam]);
-            }
-        });
-        sd.push({
-            x: xArr,
-            y: yArr,
-            type: 'scatter',
-            marker: {
-                size: 5
-            },
-            line: {
-                width: 1
-            },
-            name: ser.devName,
-        });
-    });
+
+
 
     return (
         <div className="row respodr">
@@ -66,15 +102,18 @@ export const DetailedAnalytics = ({ devices, parameters, series, selectedHourly,
                     <h2 className="dev_ttl" style={{ "fontSize": "14px" }}>Devices</h2>
                     <div className="list" style={{ marginTop: "20px" }}>
                         <ul>
-                            {devices.map((device, i) => {
+                            {deviceList.map((device, i) => {
                                 return (
                                     <li key={i}>
                                         <input
                                             type="checkbox"
-                                            value={device.name}
-                                            defaultChecked={true}
+                                            id={`custom-checkbox-${i}`}
+                                            name={device.devName}
+                                            value={device.devName}
+                                            checked={device.isChecked}
+                                            onChange={handleCheckboxChange}
                                         />
-                                        <label>{device}</label>
+                                        <label>{device.devName}</label>
                                     </li>
                                 )
                             })}
@@ -111,7 +150,7 @@ export const DetailedAnalytics = ({ devices, parameters, series, selectedHourly,
                         </div>
                     </div>
                     <Plot
-                        data={sd}
+                        data={organizedSerieData}
                         layout={{
                             height: 300,
                             margin: {
@@ -122,6 +161,9 @@ export const DetailedAnalytics = ({ devices, parameters, series, selectedHourly,
                                 pad: 5
                             },
                             xaxis: {
+                                automargin: true
+                            },
+                            yaxis: {
                                 automargin: true
                             }
                         }}

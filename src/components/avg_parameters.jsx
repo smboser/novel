@@ -3,7 +3,7 @@ import { GaugeChart } from "../components/GaugeChart";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 
-export const AvgParameters = ({ parameters, last24HoursData }) => {
+export const AvgParameters = ({ settings, parameters, last24HoursData }) => {
     const responsive = {
         superLargeDesktop: {
             // the naming can be any, depends on you.
@@ -23,6 +23,7 @@ export const AvgParameters = ({ parameters, last24HoursData }) => {
             items: 1
         }
     };
+    
 
     return (
         <Carousel
@@ -33,21 +34,17 @@ export const AvgParameters = ({ parameters, last24HoursData }) => {
             autoPlay={false}
             autoPlaySpeed={1000}
         >
-            <div key={0} className="col-md-4 col-sm-6 col-xs-12" style={{ "width": "100%" }}>
-                <GaugeChart param={parameters[0]} last24HoursData={last24HoursData} />
-            </div>
-            <div key={1} className="col-md-4 col-sm-6 col-xs-12" style={{ "width": "100%" }}>
-                <GaugeChart param={parameters[1]} last24HoursData={last24HoursData} />
-            </div>
-            <div key={2} className="col-md-4 col-sm-6 col-xs-12" style={{ "width": "100%" }}>
-                <GaugeChart param={parameters[2]} last24HoursData={last24HoursData} />
-            </div>
-            <div key={3} className="col-md-4 col-sm-6 col-xs-12" style={{ "width": "100%" }}>
-                <GaugeChart param={parameters[3]} last24HoursData={last24HoursData} />
-            </div>
-            <div key={4} className="col-md-4 col-sm-6 col-xs-12" style={{ "width": "100%" }}>
-                <GaugeChart param={parameters[4]} last24HoursData={last24HoursData} />
-            </div>
+
+            {settings ? Object.keys(settings).map((stname, i) => {
+                let setting = settings[stname];
+                let parameter = parameters.filter((parameter)=>parameter.key==stname);
+                parameter = (parameter.length > 0) ? parameter[0] : [];
+                return (
+                    <div key={i} className="col-md-4 col-sm-6 col-xs-12" style={{ "width": "100%","paddingTop":"10px", "paddingBottom":"10px"}}>
+                        <GaugeChart setting={setting} param={parameter} last24HoursData={last24HoursData} />
+                    </div>
+                );
+            }) : <div />}
         </Carousel>
     );
 };

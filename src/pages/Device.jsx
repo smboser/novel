@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, createElement } from "react";
 import { CirclesWithBar } from "react-loader-spinner";
+import * as MaterialDesign from "react-icons/md";
 import { Navbar } from "../components/nav";
 import { DeviceModel } from "../components/device_model";
 import { useAuth } from "../hooks/useAuth";
@@ -101,7 +102,7 @@ export const DevicePage = () => {
                       let delta = differenceDate(new Date(device.lastUpdate), new Date());
                       return (
                         <tr key={i}>
-                          <td><img src="images/dicon.png" /> {device.devName}</td>
+                          <td><MaterialDesign.MdAir color="#00bdd5"  size={20}/> {device.devName}</td>
                           <td>{delta}</td>
                           <td>{device.deviceType}</td>
                           <th>

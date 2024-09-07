@@ -81,6 +81,20 @@ export const getSensorData = (userInfo) => {
   return getRequest(url);
 };
 
+export const getAdvisorySettingData = (userInfo) => {
+  // For URL
+  let url = `https://prod-07.australiaeast.logic.azure.com:443/workflows/86ea5a4f3b8543f39308cba0e6a34afd/triggers/When_a_HTTP_request_is_received/paths/invoke`;
+  url = `${url}?api-version=${APP_CONST.API_VERSION}`;
+  url = `${url}&sp=${APP_CONST.SP}`;
+  url = `${url}&sv=${APP_CONST.SV}`;
+  url = `${url}&sig=wGSuCPj2oqpTrxzWsiD5R1zHKemHaNkDt4JsXIRmWUM`;
+  url = `${url}&orgName=${userInfo.orgName}`;
+  url = `${url}&authToken=${userInfo.token}`;
+  console.log("Constructed URL:", url); // Log the URL
+  // Call end point
+  return getRequest(url);
+};
+
 // src/helper/web-service.js
 export const getAdvisorySettings = (userInfo) => {
   let url = `https://prod-07.australiaeast.logic.azure.com:443/workflows/86ea5a4f3b8543f39308cba0e6a34afd/triggers/When_a_HTTP_request_is_received/paths/invoke`;

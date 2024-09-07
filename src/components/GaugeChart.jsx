@@ -1,62 +1,79 @@
 import React from 'react';
 import { GaugeComponent } from 'react-gauge-component';
-export const GaugeChart = ({ param, last24HoursData }) => {
+export const GaugeChart = ({ setting, param, last24HoursData }) => {
+   
+    let upper_limit_value = Math.floor((setting.gt) ? setting.gt : param.max_value * .7);
     let total = last24HoursData.reduce((accumulator, current) => {
         let curval = (current[param.key]) ? current[param.key] : 0
         return accumulator + curval;
     }, 0);
     let avg = Math.floor(total / last24HoursData.length);
+
+    console.log(`Inside GaugeChart component`);
+    console.log(`For setting :-----------`);
+    console.log(setting);
+    console.log(`For param :-------------`);
+    console.log(param);
+    console.log(`For last24HoursData :-------------`);
+    console.log(last24HoursData);
+    console.log(`For min :${param.min_value} and max:${param.max_value} and upper limit : ${upper_limit_value}`);
+    console.log(`For avg :${avg}`);
+
     return (
-        <div className="gauge">
-            <GaugeComponent
-                type="semicircle"
-                arc={{
-                    width: 0.2,
-                    padding: 0.005,
-                    cornerRadius: 1,
-                    subArcs: [
-                        {
-                            limit: param.upper_limit_value,
-                            color: '#5BE12C',
-                            showTick: false
+        <>
+            <div className="gauge">
+                <GaugeComponent
+                    type="semicircle"
+                    arc={{
+                        width: 0.2,
+                        padding: 0.005,
+                        cornerRadius: 1,
+                        subArcs: [
+                            {
+                                limit: upper_limit_value,
+                                color: '#75e64d',
+                                showTick: false
+                            },
+                            {
+                                color: '#ff6666',
+                                showTick: false
+                            }
+                        ]
+                    }}
+                    pointer={{
+                        color: '#345243',
+                        length: 0.80,
+                        width: 10,
+                    }}
+                    labels={{
+                        valueLabel: {
+                            formatTextValue: value => value,
+                            style: {
+                                fontSize: "35px",
+                                fill: "red",
+                                textShadow: "red 1px 1px 0px, red 0px 0px 2.5em, red 0px 0px 0.2em"
+                            },
+                            hide: true
                         },
-                        {
-                            color: '#EA4228',
-                            showTick: false
+                        tickLabels: {
+                            type: 'outer',
+                            defaultTickValueConfig: { formatTextValue: value => value + param.unit, fontSize: 10 },
+                            ticks: [
+                                { value: 0 },
+                                { value: 50 },
+                                { value: 100 }
+                            ],
                         }
-                    ]
-                }}
-                pointer={{
-                    color: '#345243',
-                    length: 0.80,
-                    width: 10,
-                }}
-                labels={{
-                    valueLabel: {
-                        formatTextValue: value => value,
-                        style: {
-                            fontSize: "35px",
-                            fill: "red",
-                            textShadow: "red 1px 1px 0px, red 0px 0px 2.5em, red 0px 0px 0.2em"
-                        }
-                    },
-                    tickLabels: {
-                        type: 'outer',
-                        defaultTickValueConfig: { formatTextValue: value => value, fontSize: 10 },
-                        ticks: [
-                            { value: 0 },
-                            { value: 50 },
-                            { value: 100 }
-                        ],
-                    }
-                }}
-                value={avg}
-                minValue={param.min_value}
-                maxValue={param.max_value}
-            />
-            <div className="info">
-                <h5>{param.name}</h5>
+                    }}
+                    value={avg}
+                    minValue={param.min_value}
+                    maxValue={param.max_value}
+                />
+                <div className="info">
+                    <h5>{param.name}</h5>
+                </div>
             </div>
-        </div>
+            <div className="reading_gauge">{avg} {param.unit}</div>
+        </>
     );
 };
