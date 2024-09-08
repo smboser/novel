@@ -17,7 +17,7 @@ export const GaugeChart = ({ setting, param, last24HoursData }) => {
     console.log(param);
     console.log(`For last24HoursData :-------------`);
     console.log(last24HoursData);
-    console.log(`For min :${param.min_value} and max:${param.max_value} and upper limit : ${upper_limit_value}`);
+    console.log(`For min :${min_value} and max:${max_value} and upper limit : ${upper_limit_value}`);
     console.log(`For avg :${avg}`);
 
     return (
@@ -26,7 +26,7 @@ export const GaugeChart = ({ setting, param, last24HoursData }) => {
                 <GaugeComponent
                     type="semicircle"
                     arc={{
-                        width: 0.2,
+                        width: 0.15,
                         padding: 0.005,
                         cornerRadius: 1,
                         subArcs: [
@@ -49,26 +49,24 @@ export const GaugeChart = ({ setting, param, last24HoursData }) => {
                     labels={{
                         valueLabel: {
                             formatTextValue: value => value,
-                            style: {
-                                fontSize: "35px",
-                                fill: "red",
-                                textShadow: "red 1px 1px 0px, red 0px 0px 2.5em, red 0px 0px 0.2em"
-                            },
                             hide: true
                         },
                         tickLabels: {
                             type: 'outer',
-                            defaultTickValueConfig: { formatTextValue: value => value + param.unit, fontSize: 10 },
-                            ticks: [
-                                { value: 0 },
-                                { value: 50 },
-                                { value: 100 }
-                            ],
+                            defaultTickValueConfig: {
+                                formatTextValue: value => value,
+                                style: {
+                                    fontSize: "11px",
+                                    fill: "#464A4F",
+                                    width: "100px"
+                                }
+                            },
+                            ticks: [],
                         }
                     }}
                     value={avg}
-                    minValue={param.min_value}
-                    maxValue={param.max_value}
+                    minValue={min_value}
+                    maxValue={max_value}
                 />
                 <div className="info">
                     <h5>{param.name}</h5>
