@@ -12,7 +12,7 @@ export const APP_CONST = {
             "min_value": 0,
             "max_value": 60,
             "unit":"°C"
-        },
+        }
         {
             "name": "Humidity",
             "key": "humidity",
@@ -27,7 +27,7 @@ export const APP_CONST = {
             "avg_value": 0,
             "min_value": 0,
             "max_value": 10000,
-            "unit":"%"
+            "unit":"ppm"
         },
         {
             "name": "TVOC",
@@ -35,7 +35,7 @@ export const APP_CONST = {
             "avg_value": 0,
             "min_value": 0,
             "max_value": 100,
-            "unit":"%"
+            "unit":"ppm"
         },
         {
             "name": "Light",
@@ -43,23 +43,23 @@ export const APP_CONST = {
             "avg_value": 0,
             "min_value": 0,
             "max_value": 8,
-            "unit":""
+            "unit":"index"
         },
         {
             "name": "Battery",
             "key": "battery",
             "avg_value": 0,
             "min_value": 0,
-            "max_value": 1000,
+            "max_value": 100,
             "unit":""
         },
         {
-            "name": "pm2_5",
+            "name": "pm2.5",
             "key": "pm2_5",
             "avg_value": 0,
             "min_value": 0,
-            "max_value": 100,
-            "unit":""
+            "max_value": 100,  
+            "unit":"ppm"
         },
         {
             "name": "pm10",
@@ -67,15 +67,15 @@ export const APP_CONST = {
             "avg_value": 0,
             "min_value": 0,
             "max_value": 100,
-            "unit":""
+            "unit":"ppm"
         },
         {
             "name": "Pressure",
             "key": "pressure",
             "avg_value": 0,
             "min_value": 0,
-            "max_value": 1000,
-            "unit":"Pa"
+            "max_value": 2000,
+            "unit":"Kpa"
         }
     ]
 };
