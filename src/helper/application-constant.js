@@ -50,7 +50,7 @@ export const APP_CONST = {
             "key": "battery",
             "avg_value": 0,
             "min_value": 0,
-            "max_value": 100,
+            "max_value": 1000,
             "unit":""
         },
         {
@@ -58,7 +58,7 @@ export const APP_CONST = {
             "key": "pm2_5",
             "avg_value": 0,
             "min_value": 0,
-            "max_value": 27,
+            "max_value": 100,
             "unit":""
         },
         {
@@ -66,7 +66,7 @@ export const APP_CONST = {
             "key": "pm10",
             "avg_value": 0,
             "min_value": 0,
-            "max_value": 27,
+            "max_value": 100,
             "unit":""
         },
         {
