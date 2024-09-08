@@ -24,9 +24,12 @@
 .table td span {
   line-height: 100% !important;
 }
-.table td input,
-.save_btn {
+.table td input {
   font-size: 1.4em !important;
+  width: 100px;
+}
+.save_btn {
+  font-size: 1em !important;
   width: 100px;
 }
 .succ_msg {

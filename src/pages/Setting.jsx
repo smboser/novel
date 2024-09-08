@@ -13,6 +13,7 @@ import {
 import styles from "./SettingPage.module.css";
 import { toast } from "react-hot-toast";
 import { CirclesWithBar } from "react-loader-spinner";
+import { APP_CONST } from "../helper/application-constant";
 
 export const SettingPage = () => {
   const { user } = useAuth();
@@ -24,7 +25,6 @@ export const SettingPage = () => {
   // Fetch data inside the component
   const fetchAlertData = async () => {
     const apiUrl = getAdvisorySettings(user);
-    console.log("Fetching URL:", apiUrl); // Log the URL for debugging
     const response = await axios.get(apiUrl);
     return response.data.value;
   };
@@ -67,33 +67,63 @@ export const SettingPage = () => {
     }
   }, [data, user]);
 
+  // Validate the lt and gt values based on APP_CONST parameters
+  const validateValues = (parameterKey, field, value) => {
+    const paramConfig = APP_CONST.parameters.find(
+      (param) => param.key === parameterKey
+    );
+    if (!paramConfig) return null;
+
+    const { min_value, max_value } = paramConfig;
+    let isValid = true;
+    let errorMsg = "";
+
+    if (field === "lt" && value < min_value) {
+      isValid = false;
+      errorMsg = `Low Threshold should be more than ${min_value}`;
+    }
+
+    if (field === "gt" && value > max_value) {
+      isValid = false;
+      errorMsg = `High Threshold should be less than ${max_value}`;
+    }
+
+    return { isValid, errorMsg };
+  };
+
   const handleSave = async () => {
     setLoaderVisible(true);
     const apiSaveUrl = setAdvisorySettings(user);
-
     try {
-      const filteredSettings = settings
-        .map(({ parameter, lt, gt, active, orgName }) => {
-          // Include both lt and gt values if they exist
-          const result = {
-            active,
-            parameter,
-            orgName,
-          };
+      const filteredSettings = settings.flatMap(
+        ({ parameter, lt, gt, active, orgName }) => {
+          const results = [];
 
+          // Create a result entry for lt if it exists
           if (lt) {
-            result.func = "lt";
-            result.level = Number(lt);
+            results.push({
+              active,
+              parameter,
+              orgName,
+              func: "lt",
+              level: Number(lt),
+            });
           }
 
+          // Create a result entry for gt if it exists
           if (gt) {
-            result.func = "gt";
-            result.level = Number(gt);
+            results.push({
+              active,
+              parameter,
+              orgName,
+              func: "gt",
+              level: Number(gt),
+            });
           }
 
-          return result;
-        })
-        .filter(({ func, level }) => func && !isNaN(level));
+          return results;
+        }
+      );
 
       if (filteredSettings.length === 0) {
         toast.warn("No settings to save.");
@@ -105,7 +135,6 @@ export const SettingPage = () => {
       setShowSuccMsg(true);
       setLoaderVisible(false);
     } catch (err) {
-      console.error("Error saving settings:", err);
       toast.error("Error saving settings. Please try again.");
       setShowErrMsg(true);
       setLoaderVisible(false);
@@ -114,11 +143,18 @@ export const SettingPage = () => {
 
   // Auto-save on blur
   const handleBlur = async (parameter, field, value) => {
-    const updatedSettings = settings.map((s) =>
-      s.parameter === parameter ? { ...s, [field]: value } : s
-    );
-    setSettings(updatedSettings);
-    await handleSave();
+    const { isValid, errorMsg } = validateValues(parameter, field, value);
+    if (isValid) {
+      const updatedSettings = settings.map((s) =>
+        s.parameter === parameter ? { ...s, [field]: value } : s
+      );
+      setSettings(updatedSettings);
+      console.log("updatedSettings", updatedSettings);
+      await handleSave();
+    } else {
+      toast.error(errorMsg);
+      alert(errorMsg);
+    }
   };
 
   useEffect(() => {
@@ -266,12 +302,12 @@ export const SettingPage = () => {
                   <Button
                     onClick={handleSave}
                     variant="contained"
-                    color="success"
+                    color="primary"
+                    disabled={isLoaderVisible}
                     className={`btn btn-success btn-block ${styles.save_btn}`}
                   >
-                    Save
+                    {isLoaderVisible ? "Saving..." : "Save"}
                   </Button>
-
                   <div className="row">
                     <div className="col-md-12 col-sm-12 col-xs-12">
                       <div
