@@ -12,7 +12,7 @@ export const APP_CONST = {
             "min_value": 0,
             "max_value": 60,
             "unit":"°C"
-        }
+        },
         {
             "name": "Humidity",
             "key": "humidity",

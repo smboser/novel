@@ -1,8 +1,9 @@
 import React from 'react';
 import { GaugeComponent } from 'react-gauge-component';
 export const GaugeChart = ({ setting, param, last24HoursData }) => {
-   
-    let upper_limit_value = Math.floor((setting.gt) ? setting.gt : param.max_value * .7);
+    let min_value = param.minValue;
+    let max_value = param.max_value;
+    let upper_limit_value = Math.floor((setting.gt) ? ((setting.gt > max_value) ? max_value * .7 : setting.gt) : max_value * .7);
     let total = last24HoursData.reduce((accumulator, current) => {
         let curval = (current[param.key]) ? current[param.key] : 0
         return accumulator + curval;
