@@ -27,7 +27,7 @@ export const AlertAdvisories = ({ settings, parameters, last24HoursData }) => {
     let advisoriesData = [];
     Object.keys(settings).forEach((setname) => {
         let setting = settings[setname];
-        let parameter = parameters.filter((parameter)=>parameter.key==setname);
+        let parameter = parameters.filter((parameter) => parameter.key == setname);
         parameter = (parameter.length > 0) ? parameter[0] : [];
         if (setting.gt) {
             last24HoursData.forEach((data) => {

@@ -9,6 +9,7 @@ import { Navbar } from "../components/nav";
 import { AvgParameters } from "../components/avg_parameters";
 import { AlertAdvisories } from "../components/alert_advisories";
 import { DetailedAnalytics } from "../components/detailed_analytics";
+import { filterLatestAlerts,getOrganizedAdvisorySettings } from "../helper/utils";
 
 export const ReportPage = () => {
     const { user } = useAuth();
@@ -34,24 +35,11 @@ export const ReportPage = () => {
         ]).then((reponses) => {
             let repAdvisorySettings = reponses[0];
             let repSensorData = reponses[1];
-            let organizedAdvisorySettings = repAdvisorySettings.value.reduce((acc, alert) => {
-                if (!acc[alert.parameter]) {
-                    acc[alert.parameter] = {
-                        lt: "",
-                        gt: "",
-                        active: alert.active,
-                        parameter: alert.parameter,
-                        orgName: user.orgName,
-                    };
-                }
-                if (alert.func === "lt") {
-                    acc[alert.parameter].lt = alert.level || "";
-                } else if (alert.func === "gt") {
-                    acc[alert.parameter].gt = alert.level || "";
-                }
-                return acc;
-            }, {});
-
+            let latestAdvisorySettings  = filterLatestAlerts(repAdvisorySettings.value);
+            let organizedAdvisorySettings = getOrganizedAdvisorySettings(latestAdvisorySettings);
+            console.log("Organized Advisory Settings:", organizedAdvisorySettings);
+            
+            
             let values = repSensorData.value;
             let sers = [];
             let devs = [];
@@ -149,7 +137,6 @@ export const ReportPage = () => {
 
                                                 <AvgParameters
                                                     settings={settings}
-                                                    parameters={parameters}
                                                     last24HoursData={last24HourEachDevice}
                                                 />
 

@@ -1,3 +1,5 @@
+import { APP_CONST } from "../helper/application-constant";
+
 export function differenceDate(date_past, date_now) {
   let date_past_time = date_past.getTime();
   let date_now_time = date_now.getTime();
@@ -72,3 +74,40 @@ export const filterLatestAlerts = (data) => {
 
   return filteredData;
 };
+
+export const getOrganizedAdvisorySettings = (data) => {
+
+  const parameters = APP_CONST.parameters.reduce((acc, parameter) => {
+    if (!acc[parameter.key]) {
+      acc[parameter.key] = {
+        name: parameter.name,
+        min_value: parameter.min_value,
+        max_value: parameter.max_value,
+        unit: parameter.unit
+      };
+    }
+    return acc;
+  }, {});
+
+  const advisorySettings = data.reduce((acc, alert) => {
+    if (!acc[alert.parameter] && alert.active) {
+      let param  = parameters[alert.parameter];
+      let curObj = {
+        lt: "",
+        gt: "",
+        active: alert.active,
+        parameter: alert.parameter,
+        orgName: alert.orgName
+      };
+      acc[alert.parameter] = {...curObj, ...param};
+    }
+    if (alert.func === "lt" && alert.active) {
+      acc[alert.parameter].lt = alert.level || "";
+    } else if (alert.func === "gt" && alert.active) {
+      acc[alert.parameter].gt = alert.level || "";
+    }
+    return acc;
+  }, {});
+
+  return advisorySettings;
+}
