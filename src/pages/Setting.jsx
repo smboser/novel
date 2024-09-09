@@ -46,9 +46,9 @@ export const SettingPage = () => {
           };
         }
         if (alert.func === "lt") {
-          acc[alert.paramDisplayName].lt = alert.level || "";
+          acc[alert.paramDisplayName].lt = alert.level || 0;
         } else if (alert.func === "gt") {
-          acc[alert.paramDisplayName].gt = alert.level || "";
+          acc[alert.paramDisplayName].gt = alert.level || 0;
         }
         return acc;
       }, {});
@@ -100,7 +100,7 @@ export const SettingPage = () => {
           const results = [];
 
           // Create a result entry for lt if it exists
-          if (lt) {
+          if (typeof lt !== undefined) {
             results.push({
               active,
               parameter,
@@ -111,7 +111,7 @@ export const SettingPage = () => {
           }
 
           // Create a result entry for gt if it exists
-          if (gt) {
+          if (typeof gt !== undefined) {
             results.push({
               active,
               parameter,
@@ -149,7 +149,6 @@ export const SettingPage = () => {
         s.parameter === parameter ? { ...s, [field]: value } : s
       );
       setSettings(updatedSettings);
-      console.log("updatedSettings", updatedSettings);
       await handleSave();
     } else {
       toast.error(errorMsg);
