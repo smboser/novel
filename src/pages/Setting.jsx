@@ -178,11 +178,10 @@ export const SettingPage = () => {
         wrapperClass="loader"
         visible={isLoaderVisible}
       />
+      <Navbar />
       <div className="formbodymain">
         <div className="row">
-          <div className="col-md-12 col-sm-12 col-xs-12">
-            <Navbar />
-          </div>
+          <div className="col-md-12 col-sm-12 col-xs-12"></div>
           <div className="">
             <div className="col-md-12 col-sm-12 col-xs-12 report" id="style-3">
               <div className="x_panel">
@@ -206,10 +205,12 @@ export const SettingPage = () => {
                     >
                       <thead>
                         <tr>
-                          <th>Active</th>
-                          <th>Alert</th>
-                          <th>Low Threshold</th>
-                          <th>High Threshold</th>
+                          <th style={{ textAlign: "center" }}>Active</th>
+                          <th style={{ textAlign: "center" }}>Alert</th>
+                          <th style={{ textAlign: "center" }}>Low Threshold</th>
+                          <th style={{ textAlign: "center" }}>
+                            High Threshold
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
@@ -302,6 +303,7 @@ export const SettingPage = () => {
                     onClick={handleSave}
                     variant="contained"
                     color="primary"
+                    style={{ color: "#ffffff", verticalAlign: "middle" }}
                     disabled={isLoaderVisible}
                     className={`btn btn-success btn-block ${styles.save_btn}`}
                   >
