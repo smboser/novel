@@ -4,12 +4,10 @@ import moment from 'moment';
 import { useState, useEffect } from "react";
 import { debounce } from '@mui/material';
 
-export const DetailedAnalytics = ({ devices, parameters, series, selectedHourly, selectedParam, setSelectedHourly, setSelectedParam }) => {
+export const DetailedAnalytics = ({ settings, series, selectedHourly, selectedParam, setSelectedHourly, setSelectedParam }) => {
     const [selectedDevices, setSelectedDevices] = useState([]);
     const [organizedSerieData, setOrganizedSerieData] = useState([]);
-
-
-
+    const devices = Object.keys(series);
     const detailedAnalyticsData = () => {
         let pdt = moment().add(-1, 'hours');
         switch (selectedHourly) {
@@ -30,10 +28,16 @@ export const DetailedAnalytics = ({ devices, parameters, series, selectedHourly,
                 break;
         }
         let sd = [];
-        series.forEach(ser => {
+        devices.forEach(device => {
             let xArr = [];
             let yArr = [];
-            ser.data.forEach(s => {
+            // If device is not in the selected list
+            if (!selectedDevices.includes(device)) {
+                return;
+            }
+            // Get the data for device
+            let data = series[device];
+            data.forEach(s => {
                 let cdt = moment(s.timestamp);
                 let yval = s[selectedParam];
                 if (cdt.diff(pdt, 'seconds') > 0 && yval) {
@@ -41,7 +45,7 @@ export const DetailedAnalytics = ({ devices, parameters, series, selectedHourly,
                     yArr.push(yval);
                 }
             });
-            if (xArr.length > 0 && yArr.length > 0 && selectedDevices.includes(ser.devName)) {
+            if (xArr.length > 0 && yArr.length > 0) {
                 sd.push({
                     x: xArr,
                     y: yArr,
@@ -52,7 +56,7 @@ export const DetailedAnalytics = ({ devices, parameters, series, selectedHourly,
                     line: {
                         width: 1
                     },
-                    name: ser.devName,
+                    name: device,
                 });
             }
         });
@@ -93,18 +97,30 @@ export const DetailedAnalytics = ({ devices, parameters, series, selectedHourly,
         setSelectedParam(event.target.value);
     };
 
+    const handleChecked = (event) => {
+        console.log("--- Inside handleChecked ---")
+        setSelectedDevices(devices);
+    };
 
-console.log("selectedDevices");
+    const handleUnchecked = (event) => {
+        console.log("--- Inside handleUnchecked ---")
+        setSelectedDevices([]);
+    };
 
-console.log(selectedDevices);
+
+
+
+    console.log(selectedDevices);
     return (
         <div className="row respodr">
             <div className="col-md-3 col-sm-2 col-xs-12">
                 <div className="dbb boxh onesec" style={{ "padding": "10px 15px", "height": "260px" }}>
                     <h2 className="dev_ttl" style={{ "fontSize": "14px" }}>Devices</h2>
                     <div className="list" style={{ marginTop: "20px" }}>
-                        <ul>
-                            {devices.map((device, i) => {
+                        <span className="label label-primary" style={{ "cursor":"pointer" }} onClick={handleChecked}>Checked</span>
+                        <span className="label label-primary" style={{ "marginLeft": "10px","cursor":"pointer" }} onClick={handleUnchecked}>Unchecked</span>
+                        <ul style={{ "marginTop": "10px" }}>
+                            {Object.keys(series).map((device, i) => {
                                 return (
                                     <li key={i}>
                                         <input
@@ -143,38 +159,44 @@ console.log(selectedDevices);
                                 name="type_filter"
                                 value={selectedParam}
                                 onChange={handleParamFilterChange}>
-                                {parameters.map((parameter, i) => {
+                                {Object.keys(settings).map((setname, i) => {
+                                    let setting = settings[setname];
                                     return (
-                                        <option key={i} value={parameter.key}>{parameter.name}</option>
+                                        <option key={i} value={setting.parameter}>{setting.name}</option>
                                     )
                                 })};
                             </select>
                         </div>
                     </div>
-                    <Plot
-                        data={organizedSerieData}
-                        layout={{
-                            height: 300,
-                            margin: {
-                                l: 30,
-                                r: 30,
-                                b: 30,
-                                t: 30,
-                                pad: 5
-                            },
-                            xaxis: {
-                                automargin: true
-                            },
-                            yaxis: {
-                                automargin: true
-                            }
-                        }}
-                        config={{
-                            displayModeBar: false
-                        }}
-                        useResizeHandler={true}
-                        style={{ width: "100%" }}
-                    />
+                    {
+                        (organizedSerieData.length > 0)
+                            ?
+                            <Plot
+                                data={organizedSerieData}
+                                layout={{
+                                    height: 300,
+                                    margin: {
+                                        l: 30,
+                                        r: 30,
+                                        b: 30,
+                                        t: 30,
+                                        pad: 5
+                                    },
+                                    xaxis: {
+                                        automargin: true
+                                    },
+                                    yaxis: {
+                                        automargin: true
+                                    }
+                                }}
+                                config={{
+                                    displayModeBar: false
+                                }}
+                                useResizeHandler={true}
+                                style={{ width: "100%" }}
+                            />
+                            : <div style={{ "paddingTop": "50px","paddingBottom": "80px" }}><b>No device selected</b></div>
+                    }
                 </div>
             </div>
         </div>

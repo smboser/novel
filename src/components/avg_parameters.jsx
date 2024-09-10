@@ -24,7 +24,6 @@ export const AvgParameters = ({ settings, last24HoursData }) => {
         }
     };
 
-
     return (
         <Carousel
             className="row"

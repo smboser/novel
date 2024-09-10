@@ -75,8 +75,7 @@ export const filterLatestAlerts = (data) => {
   return filteredData;
 };
 
-export const getOrganizedAdvisorySettings = (data) => {
-
+export const getParameters = () => {
   const parameters = APP_CONST.parameters.reduce((acc, parameter) => {
     if (!acc[parameter.key]) {
       acc[parameter.key] = {
@@ -88,10 +87,14 @@ export const getOrganizedAdvisorySettings = (data) => {
     }
     return acc;
   }, {});
+  return parameters;
+}
 
+
+export const getOrganizedAdvisorySettings = (data, parameters) => {
   const advisorySettings = data.reduce((acc, alert) => {
     if (!acc[alert.parameter] && alert.active) {
-      let param  = parameters[alert.parameter];
+      let param = parameters[alert.parameter];
       let curObj = {
         lt: "",
         gt: "",
@@ -99,7 +102,7 @@ export const getOrganizedAdvisorySettings = (data) => {
         parameter: alert.parameter,
         orgName: alert.orgName
       };
-      acc[alert.parameter] = {...curObj, ...param};
+      acc[alert.parameter] = { ...curObj, ...param };
     }
     if (alert.func === "lt" && alert.active) {
       acc[alert.parameter].lt = alert.level || "";
@@ -110,4 +113,15 @@ export const getOrganizedAdvisorySettings = (data) => {
   }, {});
 
   return advisorySettings;
+}
+
+export const calculateAvgLatestData = (latestData, parameter) => {
+  let total = 0, count = 0;
+  Object.keys(latestData).forEach(devname => {
+      if (typeof(latestData[devname][parameter]) != "undefined") {
+          total += latestData[devname][parameter];
+          count += 1;
+      }
+  });
+  return (count > 0) ?  Math.floor(total /count) : 0;
 }

@@ -1,24 +1,18 @@
 import React from 'react';
 import { GaugeComponent } from 'react-gauge-component';
+import { calculateAvgLatestData } from "../helper/utils";
 export const GaugeChart = ({ setting, last24HoursData }) => {
-    let min_value = setting.minValue;
-    let max_value = setting.max_value;
+    let {min_value, max_value, lt, gt, parameter} = setting;
     // Calculate low thohresld and high thohresld
-    let low_thohresld = Math.floor((setting.lt) ? ((setting.lt < min_value) ? min_value : setting.lt) : min_value);
-    let high_thohresld = Math.floor((setting.gt) ? ((setting.gt > max_value) ? max_value * .7 : setting.gt) : max_value * .7);
-    let total = last24HoursData.reduce((accumulator, current) => {
-        let curval = (current[setting.parameter]) ? current[setting.parameter] : 0
-        return accumulator + curval;
-    }, 0);
-    let avg = Math.floor(total / last24HoursData.length);
-
+    let low_thohresld = Math.floor((lt) ? ((lt < min_value) ? min_value : lt) : min_value);
+    let high_thohresld = Math.floor((gt) ? ((gt > max_value) ? max_value * .7 : gt) : max_value * .7);
+    // Calculate average
+    let avg = calculateAvgLatestData(last24HoursData, parameter);
     console.log(`Inside GaugeChart component`);
-    console.log(`For setting :-----------`);
-    console.log(setting);
-    console.log(`For last24HoursData :-------------`);
-    console.log(last24HoursData);
-    console.log(`For min :${min_value} and max:${max_value} and low thohresld : ${low_thohresld} and high thohresld : ${high_thohresld}`);
-    console.log(`For avg :${avg}`);
+    console.log(`Values of ${setting.parameter} parameter:`,setting);
+    console.log(`Values of latest data :`, last24HoursData);
+    console.log(`Values of min :${min_value} and max:${max_value} and low thohresld : ${low_thohresld} and high thohresld : ${high_thohresld}`);
+    console.log(`Values of avg :${avg}`);
 
     return (
         <>
@@ -41,7 +35,7 @@ export const GaugeChart = ({ setting, last24HoursData }) => {
                                 showTick: false
                             },
                             {
-                                color: '#ff6666',
+                                color: '#F5CD19',
                                 showTick: false
                             }
                         ]
@@ -67,6 +61,9 @@ export const GaugeChart = ({ setting, last24HoursData }) => {
                                     fill: "#464A4F",
                                     width: "100px"
                                 }
+                            },
+                            defaultTickLineConfig: {
+                                length: 0
                             },
                             ticks: [],
                         }

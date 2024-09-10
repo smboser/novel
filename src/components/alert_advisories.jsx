@@ -2,7 +2,7 @@ import React from 'react';
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 
-export const AlertAdvisories = ({ settings, parameters, last24HoursData }) => {
+export const AlertAdvisories = ({ settings, last24HoursData }) => {
     const responsive = {
         superLargeDesktop: {
             // the naming can be any, depends on you.
@@ -23,27 +23,43 @@ export const AlertAdvisories = ({ settings, parameters, last24HoursData }) => {
         }
     };
 
-    // Organized advisories data
+    // Organized data
     let advisoriesData = [];
+    let devices = Object.keys(last24HoursData);
     Object.keys(settings).forEach((setname) => {
         let setting = settings[setname];
-        let parameter = parameters.filter((parameter) => parameter.key == setname);
-        parameter = (parameter.length > 0) ? parameter[0] : [];
-        if (setting.gt) {
-            last24HoursData.forEach((data) => {
-                let curval = data[setname];
-                if (curval > setting.gt) {
-                    let altdata = {
-                        "devName": data.devName,
-                        "parameter": setname,
-                        "name": parameter.name,
-                        "unit": parameter.unit,
-                        "value": curval
-                    }
-                    advisoriesData.push(altdata);
+        let { name, unit, lt, gt, parameter } = setting;
+
+
+        devices.forEach((device) => {
+            let data = last24HoursData[device];
+            let curval = data[parameter];
+            // For exceeded
+            if (typeof (gt) != "undefined" && gt && curval > gt) {
+                let altdata = {
+                    "devName": device,
+                    "parameter": parameter,
+                    "name": name,
+                    "unit": unit,
+                    "value": curval,
+                    "msg": `${device} has exceeded ${parameter}`
                 }
-            });
-        }
+                advisoriesData.push(altdata);
+            }
+
+            // For subceeded
+            if (typeof (lt) != "undefined" && lt && curval < lt) {
+                let altdata = {
+                    "devName": device,
+                    "parameter": parameter,
+                    "name": name,
+                    "unit": unit,
+                    "value": curval,
+                    "msg": `${device} has subceeded ${parameter}`
+                }
+                advisoriesData.push(altdata);
+            }
+        });
     });
 
     return (
@@ -63,7 +79,7 @@ export const AlertAdvisories = ({ settings, parameters, last24HoursData }) => {
                             <h2><img src="images/temp.jpg" />{data.name} Alert</h2>
                             <h3>{data.devName}</h3>
                             <div className="temp">{data.value} {data.unit}</div>
-                            <p>{data.devName} has exceeded {data.parameter}</p>
+                            <p>{data.msg}</p>
                         </div>
                     </div>
                 );

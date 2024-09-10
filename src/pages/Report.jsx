@@ -9,16 +9,14 @@ import { Navbar } from "../components/nav";
 import { AvgParameters } from "../components/avg_parameters";
 import { AlertAdvisories } from "../components/alert_advisories";
 import { DetailedAnalytics } from "../components/detailed_analytics";
-import { filterLatestAlerts,getOrganizedAdvisorySettings } from "../helper/utils";
+import { filterLatestAlerts, getOrganizedAdvisorySettings, getParameters } from "../helper/utils";
 
 export const ReportPage = () => {
     const { user } = useAuth();
     const [isLoaderVisible, setLoaderVisible] = useState(false);
     const [settings, setSettings] = useState([]);
-    const [series, setSeries] = useState([]);
-    const [parameters, setParameters] = useState(JSON.parse(JSON.stringify(APP_CONST.parameters)));
-    const [last24HourEachDevice, setLast24HourEachDevice] = useState([]);
-    const [devices, setDevices] = useState([]);
+    const [series, setSeries] = useState(null);
+    const [last24HourEachDevice, setLast24HourEachDevice] = useState(null);
     const [selectedHourly, setSelectedHourly] = useState("last_hour");
     const [selectedParam, setSelectedParam] = useState(APP_CONST.default_parameter);
 
@@ -30,60 +28,47 @@ export const ReportPage = () => {
 
         // Call the api for getAdvisorySettingData and getSensorData
         Promise.all([
-            getAdvisorySettingData(user),
-            getSensorData(user)
+            getAdvisorySettingData(user), // Call API to get advisory setting
+            getSensorData(user)  // Call API to get sensor data
         ]).then((reponses) => {
+            let parameters = getParameters();
+            // Organized advisory settings
             let repAdvisorySettings = reponses[0];
-            let repSensorData = reponses[1];
-            let latestAdvisorySettings  = filterLatestAlerts(repAdvisorySettings.value);
-            let organizedAdvisorySettings = getOrganizedAdvisorySettings(latestAdvisorySettings);
+            let latestAdvisorySettings = filterLatestAlerts(repAdvisorySettings.value);
+            let organizedAdvisorySettings = getOrganizedAdvisorySettings(latestAdvisorySettings, parameters);
             console.log("Organized Advisory Settings:", organizedAdvisorySettings);
-            
-            
-            let values = repSensorData.value;
-            let sers = [];
-            let devs = [];
-            let lastEachDev = [];
 
-            // Organized data
-            values.forEach(value => {
+            // Organized sensor data
+            let repSensorData = reponses[1];
+            let activeAdvisorySettings = Object.keys(organizedAdvisorySettings);
+            let seriesData = {};
+            let latestData = {};
+            repSensorData.value.forEach(value => {
+                let devName = value.devName;
                 let instData = { "timestamp": value.Timestamp };
-                Object.keys(organizedAdvisorySettings).forEach((settingName) => {
-                    instData[settingName] = value[settingName];
+                activeAdvisorySettings.forEach((setname) => {
+                    instData[setname] = value[setname];
                 });
 
-                // Organized data for line chart
-                if (sers.length > 0) {
-                    let index = sers.findIndex(ser => ser.devName === value.devName);
-                    if (index !== -1)
-                        sers[index]["data"].push(instData);
-                    else sers.push({
-                        "devName": value.devName,
-                        "data": [instData]
-                    });
-                } else {
-                    sers.push({
-                        "devName": value.devName,
-                        "data": [instData]
-                    });
+                if (!seriesData[devName]) {
+                    seriesData[devName] = [];
                 }
 
-                // Organized data for gauge chart
-                let avgData = JSON.parse(JSON.stringify(instData));
-                avgData["devName"] = value.devName;
-                if (lastEachDev.length > 0) {
-                    let index = lastEachDev.findIndex(device => device.devName === value.devName);
-                    if (index !== -1) {
-                        let d1 = new Date(lastEachDev[index]['timestamp']);
-                        let d2 = new Date(value.Timestamp);
-                        if (d2.getTime() > d1.getTime()) {
-                            lastEachDev[index] = avgData;
-                        }
-                    } else lastEachDev.push(avgData);
-                } else {
-                    lastEachDev.push(avgData);
+                if (!latestData[devName]) {
+                    latestData[devName] = {};
+                }
+
+                seriesData[devName].push(instData);
+
+                if (Object.keys(latestData[devName]) == 0) {
+                    latestData[devName] = instData;
+                } else if (new Date(value.Timestamp) > new Date(latestData[devName].timestamp)) {
+                    latestData[devName] = instData;
                 }
             });
+
+            console.log("Series Data:", seriesData);
+            console.log("Latest Data:", latestData);
 
             // Sorting serices
             // sers.sort(function (a, b) {
@@ -98,11 +83,9 @@ export const ReportPage = () => {
             //     }
             // });
             // Find the unique devices
-            devs = [...new Set(sers.map(ser => ser.devName))];
             setSettings(organizedAdvisorySettings);
-            setDevices(devs);
-            setSeries(sers);
-            setLast24HourEachDevice(lastEachDev);
+            setSeries(seriesData);
+            setLast24HourEachDevice(latestData);
             setLoaderVisible(false);
         });
     }, []);
@@ -131,7 +114,7 @@ export const ReportPage = () => {
                                 <div className="centerwrapperbox">
                                     <h2 className="dev_ttlmain">All devices average</h2>
                                     {
-                                        (last24HourEachDevice.length > 0)
+                                        (last24HourEachDevice)
                                             ?
                                             <div className="chartbox dbb">
 
@@ -147,11 +130,10 @@ export const ReportPage = () => {
                                 <div className="centerwrapperbox ptopten">
                                     <h2 className="dev_ttlmain">Device advisories</h2>
                                     {
-                                        (last24HourEachDevice.length > 0)
+                                        (last24HourEachDevice)
                                             ?
                                             <AlertAdvisories
                                                 settings={settings}
-                                                parameters={parameters}
                                                 last24HoursData={last24HourEachDevice}
                                             />
                                             : "Waiting to load data...."
@@ -160,11 +142,10 @@ export const ReportPage = () => {
                                 <div className="centerwrapperbox ptopten">
                                     <h2 className="dev_ttlmain">Detailed Analytics</h2>
                                     {
-                                        (series.length > 0)
+                                        (series)
                                             ?
                                             <DetailedAnalytics
-                                                devices={devices}
-                                                parameters={parameters}
+                                                settings={settings}
                                                 series={series}
                                                 selectedHourly={selectedHourly}
                                                 selectedParam={selectedParam}
