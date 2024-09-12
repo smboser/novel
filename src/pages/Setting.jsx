@@ -91,8 +91,8 @@ export const SettingPage = () => {
     return { isValid, errorMsg };
   };
 
-  const handleSave = async () => {
-    setLoaderVisible(true);
+  const handleSave = async (isLoaderVisible = true) => {
+    if (isLoaderVisible) setLoaderVisible(true);
     const apiSaveUrl = setAdvisorySettings(user);
     try {
       const filteredSettings = settings.flatMap(
@@ -149,7 +149,7 @@ export const SettingPage = () => {
         s.parameter === parameter ? { ...s, [field]: value } : s
       );
       setSettings(updatedSettings);
-      await handleSave();
+      await handleSave(false);
     } else {
       toast.error(errorMsg);
       alert(errorMsg);
