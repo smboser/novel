@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Navbar } from "../components/nav";
+import { Footer } from "../components/footer";
 import { useAuth } from "../hooks/useAuth";
 import { InputAdornment, OutlinedInput, Button } from "@mui/material";
 import { ErrorOutline } from "@mui/icons-material";
@@ -339,6 +340,7 @@ export const SettingPage = () => {
           </div>
         </div>
       </div>
+      <Footer/>
     </>
   );
 };

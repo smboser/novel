@@ -2,6 +2,7 @@ import { useState, useEffect, createElement } from "react";
 import { CirclesWithBar } from "react-loader-spinner";
 import * as MaterialDesign from "react-icons/md";
 import { Navbar } from "../components/nav";
+import { Footer } from "../components/footer";
 import { DeviceModel } from "../components/device_model";
 import { useAuth } from "../hooks/useAuth";
 import { getDevices } from "../helper/web-service";
@@ -139,6 +140,7 @@ export const DevicePage = () => {
           />
           : ""
       }
+      <Footer/>
     </>
   );
 };

@@ -6,6 +6,7 @@ import { useAuth } from "../hooks/useAuth";
 import { APP_CONST } from "../helper/application-constant";
 import { getSensorData, getAdvisorySettingData } from "../helper/web-service";
 import { Navbar } from "../components/nav";
+import { Footer } from "../components/footer";
 import { AvgParameters } from "../components/avg_parameters";
 import { AlertAdvisories } from "../components/alert_advisories";
 import { DetailedAnalytics } from "../components/detailed_analytics";
@@ -160,6 +161,7 @@ export const ReportPage = () => {
                     </div>
                 </div>
             </div>
+            <Footer/>
         </>
     );
 };

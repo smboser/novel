@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Navbar } from "../components/nav";
-
+import { Footer } from "../components/footer";
 import { CirclesWithBar } from "react-loader-spinner";
 
 export const SurveyPage = () => {
@@ -56,6 +56,7 @@ export const SurveyPage = () => {
           </div>
         </div>
       </div>
+      <Footer/>
     </>
   );
 };

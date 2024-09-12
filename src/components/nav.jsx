@@ -1,7 +1,15 @@
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import { APP_CONST } from "../helper/application-constant";
 export const Navbar = () => {
-  const { user } = useAuth();
+  const { user,removeUserData  } = useAuth();
+  const farmer_companies = APP_CONST.farmer_companies;
+  const orgName = user.orgName;
+  const orgIcon = (farmer_companies.includes(orgName)) ? "images/logomain.png" : user.orgDetails.icon;
+  const handleLogout = (event) => {
+    console.log("--- Inside handleLogout ---")
+    removeUserData();
+};
   return (
     <nav className="navbar navbar-default">
       <div className="container-fluid">
@@ -20,7 +28,7 @@ export const Navbar = () => {
             <span className="icon-bar"></span>
           </button>
           <a className="navbar-brand" href="/devices">
-            <img src="images/logomain.png" />
+            <img src={orgIcon} className="orglog" />
           </a>
         </div>
         {/* Collect the nav links, forms, and other content for toggling */}
@@ -30,42 +38,30 @@ export const Navbar = () => {
         >
           <ul className="nav navbar-nav">
             <li>
-              <NavLink
-                to="/devices"
-                className={({ isActive }) => (isActive ? "active" : "")}
-              >
-                Devices
-              </NavLink>
+              <NavLink to="/devices">Devices</NavLink>
             </li>
             <li>
-              <NavLink
-                to="/report"
-                className={({ isActive }) => (isActive ? "active" : "")}
-              >
-                Reports
-              </NavLink>
+              <NavLink to="/report">Reports</NavLink>
             </li>
             <li>
-              <NavLink
-                to="/setting"
-                className={({ isActive }) => (isActive ? "active" : "")}
-              >
-                Setting
-              </NavLink>
+              <NavLink to="/setting">Setting</NavLink>
             </li>
-            <li>
+            <li style={{"display": (farmer_companies.includes(orgName) ? "none":"block")}}>
               <NavLink to="/survey">Occupant Survey</NavLink>
             </li>
           </ul>
           <ul className="nav navbar-nav navbar-right">
             <li>
-              <a href="#">
+              <a className="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <img src="images/avtar.jpg" />
               </a>
+              <div className="dropdown-menu">
+                <a className="dropdown-item" onClick={handleLogout}>Logout</a>
+              </div>
             </li>
           </ul>
         </div>
       </div>
-    </nav>
+    </nav >
   );
 };
