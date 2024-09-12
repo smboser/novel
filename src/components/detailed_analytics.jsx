@@ -35,12 +35,13 @@ export const DetailedAnalytics = ({ settings, series, selectedHourly, selectedPa
             if (!selectedDevices.includes(device)) {
                 return;
             }
+            debugger;
             // Get the data for device
             let data = series[device];
             data.forEach(s => {
                 let cdt = moment(s.timestamp);
                 let yval = s[selectedParam];
-                if (cdt.diff(pdt, 'seconds') > 0 && yval) {
+                if (cdt.diff(pdt, 'seconds') > 0 && typeof (yval) != "undefined" && yval != null) {
                     xArr.push(moment(s.timestamp).format('YYYY-MM-DD H:mm:ss'));
                     yArr.push(yval);
                 }
@@ -117,8 +118,8 @@ export const DetailedAnalytics = ({ settings, series, selectedHourly, selectedPa
                 <div className="dbb boxh onesec" style={{ "padding": "10px 15px", "height": "260px" }}>
                     <h2 className="dev_ttl" style={{ "fontSize": "14px" }}>Devices</h2>
                     <div className="list" style={{ marginTop: "20px" }}>
-                        <span className="label label-primary" style={{ "cursor":"pointer" }} onClick={handleChecked}>Checked</span>
-                        <span className="label label-primary" style={{ "marginLeft": "10px","cursor":"pointer" }} onClick={handleUnchecked}>Unchecked</span>
+                        <span className="label label-primary" style={{ "cursor": "pointer" }} onClick={handleChecked}>Checked</span>
+                        <span className="label label-primary" style={{ "marginLeft": "10px", "cursor": "pointer" }} onClick={handleUnchecked}>Unchecked</span>
                         <ul style={{ "marginTop": "10px" }}>
                             {Object.keys(series).map((device, i) => {
                                 return (
@@ -195,7 +196,7 @@ export const DetailedAnalytics = ({ settings, series, selectedHourly, selectedPa
                                 useResizeHandler={true}
                                 style={{ width: "100%" }}
                             />
-                            : <div style={{ "paddingTop": "50px","paddingBottom": "80px" }}><b>No device selected</b></div>
+                            : <div style={{ "paddingTop": "50px", "paddingBottom": "80px" }}><b>No device selected</b></div>
                     }
                 </div>
             </div>

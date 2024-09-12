@@ -177,8 +177,9 @@ body {
 .navbar-header .navbar-brand,
 .navbar-nav > li > a,
 .site_title {
-  color: #00bdd5 !important;
-  margin-left: 0 !important;
+    color: #000 !important;
+    margin-left: 0 !important;
+    font-weight: bold;
 }
 
 .ttl_main h2 {
