@@ -239,7 +239,7 @@ export const SettingPage = () => {
                               <span>{setting.paramDisplayName}</span>
                               <input type="hidden" value={setting.parameter} />
                             </td>
-                            <td>
+                            <td className={styles.settings_input}>
                               <OutlinedInput
                                 startAdornment={
                                   <InputAdornment position="start">
@@ -267,7 +267,7 @@ export const SettingPage = () => {
                                 aria-describedby="outlined-weight-helper-text"
                               />
                             </td>
-                            <td>
+                            <td className={styles.settings_input}>
                               <OutlinedInput
                                 startAdornment={
                                   <InputAdornment position="start">
@@ -340,7 +340,7 @@ export const SettingPage = () => {
           </div>
         </div>
       </div>
-      <Footer/>
+      <Footer />
     </>
   );
 };

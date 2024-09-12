@@ -19,6 +19,7 @@
 .table td,
 .table tr {
   vertical-align: middle !important;
+  padding: 5px !important;
 }
 
 .table td span {
@@ -41,4 +42,10 @@
   color: red;
   padding-left: 10px;
   font-size: 0.8em;
+}
+.settings_input input {
+  padding: 2px 0 0 0 !important;
+}
+.settings_input fieldset {
+  top: -13px;
 }
