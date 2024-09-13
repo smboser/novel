@@ -10,11 +10,11 @@ import { filterLatestAlerts } from "../helper/utils";
 import {
   setAdvisorySettings,
   getAdvisorySettings,
+  getMinMaxAdvisorySettings,
 } from "../helper/web-service";
 import styles from "./SettingPage.module.css";
-import { toast } from "react-hot-toast";
+import { toast, Toaster } from "react-hot-toast";
 import { CirclesWithBar } from "react-loader-spinner";
-import { APP_CONST } from "../helper/application-constant";
 
 export const SettingPage = () => {
   const { user } = useAuth();
@@ -22,11 +22,19 @@ export const SettingPage = () => {
   const [isLoaderVisible, setLoaderVisible] = useState(false);
   const [showSuccMsg, setShowSuccMsg] = useState(false);
   const [showErrMsg, setShowErrMsg] = useState(false);
+  const [minMaxResult, setMinMaxResult] = useState([]);
+  const [isEligibleForSave, setIsEligibleForSave] = useState(false);
 
   // Fetch data inside the component
   const fetchAlertData = async () => {
     const apiUrl = getAdvisorySettings(user);
     const response = await axios.get(apiUrl);
+    if (response?.data?.value) {
+      // calling min / max api
+      const minMaxApiUrl = getMinMaxAdvisorySettings(user);
+      const result = await axios.get(minMaxApiUrl);
+      setMinMaxResult(result?.data?.value ?? []);
+    }
     return response.data.value;
   };
 
@@ -34,7 +42,7 @@ export const SettingPage = () => {
 
   // Update state when data is fetched
   useEffect(() => {
-    if (data) {
+    if (data && minMaxResult) {
       const modifiedData = filterLatestAlerts(data);
       const organizedData = modifiedData.reduce((acc, alert) => {
         if (!acc[alert.paramDisplayName]) {
@@ -53,42 +61,75 @@ export const SettingPage = () => {
         }
         return acc;
       }, {});
-      setSettings(
-        Object.entries(organizedData).map(
-          ([paramDisplayName, { lt, gt, active, parameter, orgName }]) => ({
-            parameter,
-            paramDisplayName,
-            lt,
-            gt,
-            active,
-            orgName,
-          })
-        )
+      const settingsData = Object.entries(organizedData).map(
+        ([paramDisplayName, { lt, gt, active, parameter, orgName }]) => ({
+          parameter,
+          paramDisplayName,
+          lt,
+          gt,
+          active,
+          orgName,
+        })
       );
+      settingsData.forEach((s) => {
+        s["min"] = minMaxResult.find(
+          (mm) => mm.parameter === s.parameter
+        )?.min_value;
+        s["max"] = minMaxResult.find(
+          (mm) => mm.parameter === s.parameter
+        )?.max_value;
+      });
+      setSettings(settingsData);
     }
-  }, [data, user]);
+  }, [minMaxResult, user]);
+
+  useEffect(() => {
+    console.log("settings", settings);
+  }, [settings]);
 
   // Validate the lt and gt values based on APP_CONST parameters
   const validateValues = (parameterKey, field, value) => {
-    const paramConfig = APP_CONST.parameters.find(
-      (param) => param.key === parameterKey
-    );
-    if (!paramConfig) return null;
-
-    const { min_value, max_value } = paramConfig;
+    const selectedSetting = settings.find((s) => s?.parameter === parameterKey);
     let isValid = true;
     let errorMsg = "";
-
-    if (field === "lt" && value < min_value) {
-      isValid = false;
-      errorMsg = `Low Threshold should be more than ${min_value}`;
+    switch (field) {
+      case "lt":
+        if (selectedSetting?.min > value) {
+          isValid = false;
+          errorMsg = `Low Threshold should be more than or equal ${selectedSetting.min}`;
+        }
+        if (selectedSetting?.gt <= value) {
+          isValid = false;
+          errorMsg = `Low Threshold should be less than ${selectedSetting.gt}`;
+        }
+        break;
+      case "gt":
+        if (selectedSetting?.max < value) {
+          isValid = false;
+          errorMsg = `High Threshold should be less than or equal ${selectedSetting.max}`;
+        }
+        if (selectedSetting?.lt >= value) {
+          isValid = false;
+          errorMsg = `High Threshold should be more than ${selectedSetting.lt}`;
+        }
+        break;
+      case "min":
+        if (selectedSetting?.lt < value) {
+          console.log("here");
+          isValid = false;
+          errorMsg = `Minimum value should be less than or equal ${selectedSetting.lt}`;
+        }
+        break;
+      case "max":
+        if (selectedSetting?.gt > value) {
+          isValid = false;
+          errorMsg = `Minimum value should be less than or equal ${selectedSetting.lt}`;
+        }
+        break;
+      default:
+        isValid = true;
+        errorMsg = "";
     }
-
-    if (field === "gt" && value > max_value) {
-      isValid = false;
-      errorMsg = `High Threshold should be less than ${max_value}`;
-    }
-
     return { isValid, errorMsg };
   };
 
@@ -97,7 +138,7 @@ export const SettingPage = () => {
     const apiSaveUrl = setAdvisorySettings(user);
     try {
       const filteredSettings = settings.flatMap(
-        ({ parameter, lt, gt, active, orgName }) => {
+        ({ parameter, lt, gt, min, max, active, orgName }) => {
           const results = [];
 
           // Create a result entry for lt if it exists
@@ -106,6 +147,8 @@ export const SettingPage = () => {
               active,
               parameter,
               orgName,
+              min: Number(min),
+              max: Number(max),
               func: "lt",
               level: Number(lt),
             });
@@ -117,6 +160,8 @@ export const SettingPage = () => {
               active,
               parameter,
               orgName,
+              min: Number(min),
+              max: Number(max),
               func: "gt",
               level: Number(gt),
             });
@@ -145,21 +190,32 @@ export const SettingPage = () => {
   // Auto-save on blur
   const handleBlur = async (parameter, field, value) => {
     const { isValid, errorMsg } = validateValues(parameter, field, value);
+    console.log("isValid", isValid);
     if (isValid) {
       const updatedSettings = settings.map((s) =>
-        s.parameter === parameter ? { ...s, [field]: value } : s
+        s.parameter === parameter ? { ...s, [field]: Number(value) } : s
       );
+      console.log("updatedSettings", updatedSettings);
       setSettings(updatedSettings);
-      await handleSave(false);
+      setIsEligibleForSave(true);
+      // await handleSave(false);
     } else {
       toast.error(errorMsg);
-      alert(errorMsg);
+      // alert(errorMsg);
     }
   };
 
   useEffect(() => {
     setLoaderVisible(isLoading);
   }, [isLoading]);
+
+  useEffect(() => {
+    if (isEligibleForSave !== false) {
+      console.log("setIsEligibleForSave", isEligibleForSave);
+      setIsEligibleForSave(false);
+      handleSave(false);
+    }
+  }, [isEligibleForSave]);
 
   useEffect(() => {
     setTimeout(() => {
@@ -172,6 +228,7 @@ export const SettingPage = () => {
 
   return (
     <>
+      <Toaster position="top-right" reverseOrder={false} />
       <CirclesWithBar
         color="#00bfff"
         height="70"
@@ -208,10 +265,12 @@ export const SettingPage = () => {
                         <tr>
                           <th style={{ textAlign: "center" }}>Active</th>
                           <th style={{ textAlign: "center" }}>Alert</th>
+                          <th style={{ textAlign: "center" }}>Minimum</th>
                           <th style={{ textAlign: "center" }}>Low Threshold</th>
                           <th style={{ textAlign: "center" }}>
                             High Threshold
                           </th>
+                          <th style={{ textAlign: "center" }}>Maximum</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -230,6 +289,7 @@ export const SettingPage = () => {
                                           : s
                                       )
                                     );
+                                    setIsEligibleForSave(true);
                                   }}
                                 />
                                 <span className="slider round"></span>
@@ -246,21 +306,21 @@ export const SettingPage = () => {
                                     <ErrorOutline style={{ color: "red" }} />
                                   </InputAdornment>
                                 }
-                                value={setting.lt}
-                                onChange={(e) => {
-                                  setSettings((prev) =>
-                                    prev.map((s) =>
-                                      s.parameter === setting.parameter
-                                        ? { ...s, lt: e.target.value }
-                                        : s
-                                    )
-                                  );
-                                }}
-                                onBlur={() =>
+                                defaultValue={setting.min}
+                                // onChange={(e) => {
+                                //   setSettings((prev) =>
+                                //     prev.map((s) =>
+                                //       s.parameter === setting.parameter
+                                //         ? { ...s, min: e.target.value }
+                                //         : s
+                                //     )
+                                //   );
+                                // }}
+                                onBlur={(e) =>
                                   handleBlur(
                                     setting.parameter,
-                                    "lt",
-                                    setting.lt
+                                    "min",
+                                    e.target.value
                                   )
                                 }
                                 disabled={!setting.active}
@@ -274,21 +334,77 @@ export const SettingPage = () => {
                                     <ErrorOutline style={{ color: "red" }} />
                                   </InputAdornment>
                                 }
-                                value={setting.gt}
-                                onChange={(e) => {
-                                  setSettings((prev) =>
-                                    prev.map((s) =>
-                                      s.parameter === setting.parameter
-                                        ? { ...s, gt: e.target.value }
-                                        : s
-                                    )
-                                  );
-                                }}
-                                onBlur={() =>
+                                defaultValue={setting.lt}
+                                // onChange={(e) => {
+                                //   setSettings((prev) =>
+                                //     prev.map((s) =>
+                                //       s.parameter === setting.parameter
+                                //         ? { ...s, lt: e.target.value }
+                                //         : s
+                                //     )
+                                //   );
+                                // }}
+                                onBlur={(e) =>
+                                  handleBlur(
+                                    setting.parameter,
+                                    "lt",
+                                    e.target.value
+                                  )
+                                }
+                                disabled={!setting.active}
+                                aria-describedby="outlined-weight-helper-text"
+                              />
+                            </td>
+                            <td className={styles.settings_input}>
+                              <OutlinedInput
+                                startAdornment={
+                                  <InputAdornment position="start">
+                                    <ErrorOutline style={{ color: "red" }} />
+                                  </InputAdornment>
+                                }
+                                defaultValue={setting.gt}
+                                // onChange={(e) => {
+                                //   setSettings((prev) =>
+                                //     prev.map((s) =>
+                                //       s.parameter === setting.parameter
+                                //         ? { ...s, lt: e.target.value }
+                                //         : s
+                                //     )
+                                //   );
+                                // }}
+                                onBlur={(e) =>
                                   handleBlur(
                                     setting.parameter,
                                     "gt",
-                                    setting.gt
+                                    e.target.value
+                                  )
+                                }
+                                disabled={!setting.active}
+                                aria-describedby="outlined-weight-helper-text"
+                              />
+                            </td>
+                            <td className={styles.settings_input}>
+                              <OutlinedInput
+                                startAdornment={
+                                  <InputAdornment position="start">
+                                    <ErrorOutline style={{ color: "red" }} />
+                                  </InputAdornment>
+                                }
+                                defaultValue={setting.max}
+                                // onChange={(e) => {
+                                //   setSettings((prev) =>
+                                //     prev.map((s) =>
+                                //       s.parameter === setting.parameter
+                                //         ? { ...s, max: e.target.value }
+                                //         : s
+                                //     )
+                                //   );
+                                // }}
+                                onBlur={(e) =>
+                                  handleBlur(
+                                    setting.parameter,
+                                    "max",
+                                    e.target.value
                                   )
                                 }
                                 disabled={!setting.active}

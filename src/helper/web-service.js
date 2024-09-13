@@ -119,3 +119,15 @@ export const setAdvisorySettings = (userInfo) => {
   console.log("Constructed URL:", url); // Log the URL
   return url;
 };
+
+export const getMinMaxAdvisorySettings = (userInfo) => {
+  let url = `https://prod-23.australiaeast.logic.azure.com:443/workflows/af8858ba45c141d9a134be3243dc1d97/triggers/When_a_HTTP_request_is_received/paths/invoke`;
+  url = `${url}?api-version=${APP_CONST.API_VERSION}`;
+  url = `${url}&sp=${APP_CONST.SP}`;
+  url = `${url}&sv=${APP_CONST.SV}`;
+  url = `${url}&sig=c00G615RA6SgbvHtlOr4QamzmiEkwZ7zoB62sy2XUw4`;
+  url = `${url}&orgName=${userInfo.orgName}`;
+  url = `${url}&authToken=${userInfo.token}`;
+  console.log("Constructed URL:", url); // Log the URL
+  return url;
+};
