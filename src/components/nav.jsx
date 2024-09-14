@@ -51,13 +51,8 @@ export const Navbar = () => {
             </li>
           </ul>
           <ul className="nav navbar-nav navbar-right">
-            <li>
-              <a className="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <img src="images/avtar.jpg" />
-              </a>
-              <div className="dropdown-menu">
-                <a className="dropdown-item" onClick={handleLogout}>Logout</a>
-              </div>
+            <li style={{"marginTop":"10px"}}>
+              <button type="button" class="btn btn-info btn-sm" onClick={handleLogout}>Logout</button>
             </li>
           </ul>
         </div>
