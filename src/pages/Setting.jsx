@@ -24,6 +24,7 @@ export const SettingPage = () => {
   const [showErrMsg, setShowErrMsg] = useState(false);
   const [minMaxResult, setMinMaxResult] = useState([]);
   const [isEligibleForSave, setIsEligibleForSave] = useState(false);
+  const [errors, setErrors] = useState({});
 
   // Fetch data inside the component
   const fetchAlertData = async () => {
@@ -49,6 +50,8 @@ export const SettingPage = () => {
           acc[alert.paramDisplayName] = {
             lt: "",
             gt: "",
+            min: alert.min,
+            max: alert.max,
             active: alert.active,
             parameter: alert.parameter,
             orgName: user.orgName,
@@ -62,26 +65,31 @@ export const SettingPage = () => {
         return acc;
       }, {});
       const settingsData = Object.entries(organizedData).map(
-        ([paramDisplayName, { lt, gt, active, parameter, orgName }]) => ({
+        ([
+          paramDisplayName,
+          { lt, gt, min, max, active, parameter, orgName },
+        ]) => ({
           parameter,
           paramDisplayName,
           lt,
           gt,
+          min,
+          max,
           active,
           orgName,
         })
       );
-      settingsData.forEach((s) => {
-        s["min"] = minMaxResult.find(
-          (mm) => mm.parameter === s.parameter
-        )?.min_value;
-        s["max"] = minMaxResult.find(
-          (mm) => mm.parameter === s.parameter
-        )?.max_value;
-      });
+      // settingsData.forEach((s) => {
+      //   s["min"] = minMaxResult.find(
+      //     (mm) => mm.parameter === s.parameter
+      //   )?.min_value;
+      //   s["max"] = minMaxResult.find(
+      //     (mm) => mm.parameter === s.parameter
+      //   )?.max_value;
+      // });
       setSettings(settingsData);
     }
-  }, [minMaxResult, user]);
+  }, [data, user]);
 
   useEffect(() => {
     console.log("settings", settings);
@@ -115,7 +123,6 @@ export const SettingPage = () => {
         break;
       case "min":
         if (selectedSetting?.lt < value) {
-          console.log("here");
           isValid = false;
           errorMsg = `Minimum value should be less than or equal ${selectedSetting.lt}`;
         }
@@ -190,18 +197,17 @@ export const SettingPage = () => {
   // Auto-save on blur
   const handleBlur = async (parameter, field, value) => {
     const { isValid, errorMsg } = validateValues(parameter, field, value);
-    console.log("isValid", isValid);
     if (isValid) {
       const updatedSettings = settings.map((s) =>
         s.parameter === parameter ? { ...s, [field]: Number(value) } : s
       );
-      console.log("updatedSettings", updatedSettings);
       setSettings(updatedSettings);
+      setErrors((prev) => ({ ...prev, [`${parameter}_${field}`]: false }));
       setIsEligibleForSave(true);
-      // await handleSave(false);
     } else {
       toast.error(errorMsg);
-      // alert(errorMsg);
+      setErrors((prev) => ({ ...prev, [`${parameter}_${field}`]: true }));
+      // TODO: Re-render the form with its original values
     }
   };
 
@@ -211,7 +217,6 @@ export const SettingPage = () => {
 
   useEffect(() => {
     if (isEligibleForSave !== false) {
-      console.log("setIsEligibleForSave", isEligibleForSave);
       setIsEligibleForSave(false);
       handleSave(false);
     }
@@ -307,15 +312,6 @@ export const SettingPage = () => {
                                   </InputAdornment>
                                 }
                                 defaultValue={setting.min}
-                                // onChange={(e) => {
-                                //   setSettings((prev) =>
-                                //     prev.map((s) =>
-                                //       s.parameter === setting.parameter
-                                //         ? { ...s, min: e.target.value }
-                                //         : s
-                                //     )
-                                //   );
-                                // }}
                                 onBlur={(e) =>
                                   handleBlur(
                                     setting.parameter,
@@ -324,6 +320,21 @@ export const SettingPage = () => {
                                   )
                                 }
                                 disabled={!setting.active}
+                                error={
+                                  errors[`${setting.parameter}_min`] || false
+                                }
+                                style={{
+                                  borderColor: errors[
+                                    `${setting.parameter}_min`
+                                  ]
+                                    ? "red"
+                                    : "",
+                                  borderWidth: errors[
+                                    `${setting.parameter}_min`
+                                  ]
+                                    ? "2px"
+                                    : "",
+                                }}
                                 aria-describedby="outlined-weight-helper-text"
                               />
                             </td>
@@ -335,15 +346,6 @@ export const SettingPage = () => {
                                   </InputAdornment>
                                 }
                                 defaultValue={setting.lt}
-                                // onChange={(e) => {
-                                //   setSettings((prev) =>
-                                //     prev.map((s) =>
-                                //       s.parameter === setting.parameter
-                                //         ? { ...s, lt: e.target.value }
-                                //         : s
-                                //     )
-                                //   );
-                                // }}
                                 onBlur={(e) =>
                                   handleBlur(
                                     setting.parameter,
@@ -352,6 +354,17 @@ export const SettingPage = () => {
                                   )
                                 }
                                 disabled={!setting.active}
+                                error={
+                                  errors[`${setting.parameter}_lt`] || false
+                                }
+                                style={{
+                                  borderColor: errors[`${setting.parameter}_lt`]
+                                    ? "red"
+                                    : "",
+                                  borderWidth: errors[`${setting.parameter}_lt`]
+                                    ? "2px"
+                                    : "",
+                                }}
                                 aria-describedby="outlined-weight-helper-text"
                               />
                             </td>
@@ -363,15 +376,6 @@ export const SettingPage = () => {
                                   </InputAdornment>
                                 }
                                 defaultValue={setting.gt}
-                                // onChange={(e) => {
-                                //   setSettings((prev) =>
-                                //     prev.map((s) =>
-                                //       s.parameter === setting.parameter
-                                //         ? { ...s, lt: e.target.value }
-                                //         : s
-                                //     )
-                                //   );
-                                // }}
                                 onBlur={(e) =>
                                   handleBlur(
                                     setting.parameter,
@@ -380,6 +384,17 @@ export const SettingPage = () => {
                                   )
                                 }
                                 disabled={!setting.active}
+                                error={
+                                  errors[`${setting.parameter}_gt`] || false
+                                }
+                                style={{
+                                  borderColor: errors[`${setting.parameter}_gt`]
+                                    ? "red"
+                                    : "",
+                                  borderWidth: errors[`${setting.parameter}_gt`]
+                                    ? "2px"
+                                    : "",
+                                }}
                                 aria-describedby="outlined-weight-helper-text"
                               />
                             </td>
@@ -408,6 +423,21 @@ export const SettingPage = () => {
                                   )
                                 }
                                 disabled={!setting.active}
+                                error={
+                                  errors[`${setting.parameter}_max`] || false
+                                }
+                                style={{
+                                  borderColor: errors[
+                                    `${setting.parameter}_max`
+                                  ]
+                                    ? "red"
+                                    : "",
+                                  borderWidth: errors[
+                                    `${setting.parameter}_max`
+                                  ]
+                                    ? "2px"
+                                    : "",
+                                }}
                                 aria-describedby="outlined-weight-helper-text"
                               />
                             </td>
