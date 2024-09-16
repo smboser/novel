@@ -1,13 +1,13 @@
 import React from 'react';
 import { GaugeComponent } from 'react-gauge-component';
 import { calculateAvgLatestData } from "../helper/utils";
-export const GaugeChart = ({ setting, last24HoursData }) => {
+export const GaugeChart = ({ setting, selectedDevices, last24HoursData }) => {
     let {min_value, max_value, lt, gt, parameter} = setting;
     // Calculate low thohresld and high thohresld
     let low_thohresld = Math.floor((lt) ? ((lt < min_value) ? min_value : lt) : min_value);
     let high_thohresld = Math.floor((gt) ? ((gt > max_value) ? max_value * .7 : gt) : max_value * .7);
     // Calculate average
-    let avg = calculateAvgLatestData(last24HoursData, parameter);
+    let avg = calculateAvgLatestData(last24HoursData, parameter, selectedDevices);
     console.log(`Inside GaugeChart component`);
     console.log(`Values of ${setting.parameter} parameter:`,setting);
     console.log(`Values of latest data :`, last24HoursData);

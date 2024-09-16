@@ -3,7 +3,7 @@ import { GaugeChart } from "../components/GaugeChart";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 
-export const AvgParameters = ({ settings, last24HoursData }) => {
+export const AvgParameters = ({ settings, selectedDevices, last24HoursData }) => {
     const responsive = {
         superLargeDesktop: {
             // the naming can be any, depends on you.
@@ -12,7 +12,7 @@ export const AvgParameters = ({ settings, last24HoursData }) => {
         },
         desktop: {
             breakpoint: { max: 3000, min: 1024 },
-            items: 3
+            items: 4
         },
         tablet: {
             breakpoint: { max: 1024, min: 464 },
@@ -38,7 +38,7 @@ export const AvgParameters = ({ settings, last24HoursData }) => {
                 let setting = settings[stname];
                 return (
                     <div key={i} className="col-md-4 col-sm-6 col-xs-12" style={{ "width": "100%", "paddingTop": "10px", "paddingBottom": "10px" }}>
-                        <GaugeChart setting={setting} last24HoursData={last24HoursData} />
+                        <GaugeChart setting={setting} selectedDevices={selectedDevices} last24HoursData={last24HoursData} />
                     </div>
                 );
             }) : <div />}

@@ -8,15 +8,17 @@ import { getSensorData, getAdvisorySettingData } from "../helper/web-service";
 import { Navbar } from "../components/nav";
 import { Footer } from "../components/footer";
 import { AvgParameters } from "../components/avg_parameters";
+import { DeviceList } from "../components/deviceList";
 import { AlertAdvisories } from "../components/alert_advisories";
 import { DetailedAnalytics } from "../components/detailed_analytics";
 import { filterLatestAlerts, getOrganizedAdvisorySettings, getParameters } from "../helper/utils";
-
 export const ReportPage = () => {
     const { user } = useAuth();
     const [isLoaderVisible, setLoaderVisible] = useState(false);
     const [settings, setSettings] = useState([]);
     const [series, setSeries] = useState(null);
+    const [devices, setDevices] = useState([]);
+    const [selectedDevices, setSelectedDevices] = useState([]);
     const [last24HourEachDevice, setLast24HourEachDevice] = useState(null);
     const [selectedHourly, setSelectedHourly] = useState("last_hour");
     const [selectedParam, setSelectedParam] = useState(APP_CONST.default_parameter);
@@ -44,6 +46,7 @@ export const ReportPage = () => {
             let activeAdvisorySettings = Object.keys(organizedAdvisorySettings);
             let seriesData = {};
             let latestData = {};
+            let deviceList = new Set();
             repSensorData.value.forEach(value => {
                 let devName = value.devName;
                 let instData = { "timestamp": value.Timestamp };
@@ -59,8 +62,11 @@ export const ReportPage = () => {
                     latestData[devName] = {};
                 }
 
+                // Added devices name
+                deviceList.add(devName);
+                // Push sensore data
                 seriesData[devName].push(instData);
-
+                // Push last 24 hours data
                 if (Object.keys(latestData[devName]) == 0) {
                     latestData[devName] = instData;
                 } else if (new Date(value.Timestamp) > new Date(latestData[devName].timestamp)) {
@@ -71,25 +77,44 @@ export const ReportPage = () => {
             console.log("Series Data:", seriesData);
             console.log("Latest Data:", latestData);
 
-            // Sorting serices
-            // sers.sort(function (a, b) {
-            //     var key1 = new Date(a.timestamp);
-            //     var key2 = new Date(b.timestamp);
-            //     if (key1 < key2) {
-            //         return -1;
-            //     } else if (key1 == key2) {
-            //         return 0;
-            //     } else {
-            //         return 1;
-            //     }
-            // });
             // Find the unique devices
+            deviceList = Array.from(deviceList);
             setSettings(organizedAdvisorySettings);
             setSeries(seriesData);
+            setDevices(deviceList);
+            setSelectedDevices(deviceList);
             setLast24HourEachDevice(latestData);
             setLoaderVisible(false);
         });
     }, []);
+
+
+    const handleCheckboxChange = (event) => {
+        event.stopPropagation();
+        event.preventDefault();
+        console.log("--- Inside handleCheckboxChange ---");
+        let value = event.target.value;
+        let isChecked = event.target.checked;
+        if (isChecked) {
+            setSelectedDevices([...selectedDevices, value]);
+        } else {
+            setSelectedDevices(selectedDevices.filter((id) => id !== value));
+        }
+    };
+
+    const handleChecked = (event) => {
+        event.stopPropagation();
+        event.preventDefault();
+        console.log("--- Inside handleChecked ---")
+        setSelectedDevices(devices);
+    };
+
+    const handleUnchecked = (event) => {
+        event.stopPropagation();
+        event.preventDefault();
+        console.log("--- Inside handleUnchecked ---")
+        setSelectedDevices([]);
+    };
 
 
     return (
@@ -106,62 +131,78 @@ export const ReportPage = () => {
                     <div className="col-md-12 col-sm-12 col-xs-12">
                         <Navbar />
                     </div>
-                    <div className="col-md-12 col-sm-12 col-xs-12 report" id="style-3">
-                        <div className="x_panel">
-                            <div className="col-md-12 col-sm-12 col-xs-12">
-                                <div className="ttl_main center">
-                                    <h2 style={{ textAlign: "center" }}>Device Data</h2>
+                    <div className="col-md-12 col-sm-12 col-xs-12">
+                        <h2 style={{ textAlign: "center" }}>Device Data</h2>
+                        <div className="row report_page">
+                            <div className="col-md-2 col-sm-3 col-xs-12">
+                                <h2 className="dev_ttlmain">Devices</h2>
+                                <div className="dbb chtbox">
+                                    <span className="label label-primary" style={{ "cursor": "pointer" }} onClick={handleChecked}>Checked</span>
+                                    <span className="label label-primary" style={{ "marginLeft": "10px", "cursor": "pointer" }} onClick={handleUnchecked}>Unchecked</span>
+                                    <div className="list">
+                                        {
+                                            (devices.length > 0)
+                                                ?
+                                                <DeviceList
+                                                    deviceList={devices}
+                                                    selectedDeviceList={selectedDevices}
+                                                    changeHandeler={handleCheckboxChange}></DeviceList>
+                                                : <div className="waiting_loader">Waiting to load data....</div>
+                                        }
+                                    </div>
                                 </div>
-                                <div className="centerwrapperbox">
-                                    <h2 className="dev_ttlmain">All devices average</h2>
+                            </div>
+                            <div className="col-md-10 col-sm-9 col-xs-12">
+                                <h2 className="dev_ttlmain">All devices average</h2>
+                                <div className="dbb chartbox" style={{ "height": "220px" }}>
                                     {
                                         (last24HourEachDevice)
                                             ?
-                                            <div className="chartbox dbb">
-
-                                                <AvgParameters
-                                                    settings={settings}
-                                                    last24HoursData={last24HourEachDevice}
-                                                />
-
-                                            </div>
-                                            : "Waiting to load data...."
-                                    }
-                                </div>
-                                <div className="centerwrapperbox ptopten">
-                                    <h2 className="dev_ttlmain">Device advisories</h2>
-                                    {
-                                        (last24HourEachDevice)
-                                            ?
-                                            <AlertAdvisories
+                                            <AvgParameters
                                                 settings={settings}
+                                                selectedDevices={selectedDevices}
                                                 last24HoursData={last24HourEachDevice}
                                             />
-                                            : "Waiting to load data...."
+                                            : <div className="waiting_loader">Waiting to load data....</div>
                                     }
                                 </div>
-                                <div className="centerwrapperbox ptopten">
-                                    <h2 className="dev_ttlmain">Detailed Analytics</h2>
+                                <h2 className="dev_ttlmain">Detailed analytics</h2>
+                                <div className="dbb chtbox" style={{ "height": "370px" }}>
                                     {
                                         (series)
                                             ?
                                             <DetailedAnalytics
                                                 settings={settings}
+                                                devices={devices}
+                                                selectedDevices={selectedDevices}
                                                 series={series}
                                                 selectedHourly={selectedHourly}
                                                 selectedParam={selectedParam}
                                                 setSelectedHourly={setSelectedHourly}
                                                 setSelectedParam={setSelectedParam}
                                             ></DetailedAnalytics>
-                                            : "Waiting to load data...."
+                                            : <div className="waiting_loader">Waiting to load data....</div>
                                     }
                                 </div>
                             </div>
+                            <div className="col-md-12 col-sm-12 col-xs-12">
+                                <h2 className="dev_ttlmain">Device advisories</h2>
+                                {
+                                    (last24HourEachDevice)
+                                        ?
+                                        <AlertAdvisories
+                                            settings={settings}
+                                            last24HoursData={last24HourEachDevice}
+                                        />
+                                        : <div className="waiting_loader">Waiting to load data....</div>
+                                }
+                            </div>
                         </div>
                     </div>
+
                 </div>
             </div>
-            <Footer/>
+            <Footer />
         </>
     );
 };

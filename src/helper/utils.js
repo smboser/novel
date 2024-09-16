@@ -100,9 +100,11 @@ export const getOrganizedAdvisorySettings = (data, parameters) => {
         gt: "",
         active: alert.active,
         parameter: alert.parameter,
-        orgName: alert.orgName
+        orgName: alert.orgName,
+        min_value: alert.min,
+        max_value: alert.max
       };
-      acc[alert.parameter] = { ...curObj, ...param };
+      acc[alert.parameter] = {...param, ...curObj};
     }
     if (alert.func === "lt" && alert.active) {
       acc[alert.parameter].lt = alert.level || "";
@@ -115,10 +117,10 @@ export const getOrganizedAdvisorySettings = (data, parameters) => {
   return advisorySettings;
 }
 
-export const calculateAvgLatestData = (latestData, parameter) => {
+export const calculateAvgLatestData = (latestData, parameter, selectedDevices) => {
   let total = 0, count = 0;
   Object.keys(latestData).forEach(devname => {
-      if (typeof(latestData[devname][parameter]) != "undefined") {
+      if (typeof(latestData[devname][parameter]) != "undefined" && selectedDevices.includes(devname)) {
           total += latestData[devname][parameter];
           count += 1;
       }

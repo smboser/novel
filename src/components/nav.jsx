@@ -52,7 +52,7 @@ export const Navbar = () => {
           </ul>
           <ul className="nav navbar-nav navbar-right">
             <li style={{"marginTop":"10px"}}>
-              <button type="button" class="btn btn-info btn-sm" onClick={handleLogout}>Logout</button>
+              <button type="button" className="btn btn-info btn-sm" onClick={handleLogout}>Logout</button>
             </li>
           </ul>
         </div>

@@ -76,7 +76,7 @@ export const APP_CONST = {
             "avg_value": 0,
             "min_value": 0,
             "max_value": 2000,
-            "unit":"Kpa"
+            "unit":"milibar"
         }
     ]
 };
