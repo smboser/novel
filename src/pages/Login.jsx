@@ -5,7 +5,7 @@ import { useAuth } from "../hooks/useAuth";
 
 // Import redux and actions
 import { connect } from 'react-redux';
-import { setUserName } from "../../actions";
+import { setUserDetails } from "../redux/actions/userActions";
 
 export const LoginPage = () => {
   const [companyPassword, setCompanyPassword] = useState("");
@@ -117,7 +117,7 @@ const mapStateToProps = (state) => ({
 
 // mapDispatchToProps
 const mapDispatchToProps = (dispatch) => ({
-  setUserName: (data) => dispatch(setUserName(data)), // Use the correct action creator
+  setUserDetails: (data) => dispatch(setUserDetails(data)), // Use the correct action creator
 });
 
 // Connect component to Redux

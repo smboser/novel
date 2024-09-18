@@ -1,11 +1,11 @@
-import { SET_USER_NAME } from './actions';
+import { SET_USER_NAME } from '../actions/userActions';
 
 const initialState = {
   users: null,
 };
 
-// Reducer
-const rootReducer = (state = initialState, action) => {
+// User Reducer
+const userReducer = (state = initialState, action) => {
   switch (action.type) {
     case SET_USER_NAME:
       return {
@@ -17,4 +17,4 @@ const rootReducer = (state = initialState, action) => {
   }
 };
 
-export default rootReducer;
+export default userReducer;
