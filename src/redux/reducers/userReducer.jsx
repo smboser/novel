@@ -1,13 +1,13 @@
-import { SET_USER_NAME } from '../actions/userActions';
+import { SET_USER_DETAILS } from '../actions/userActions';
 
 const initialState = {
   users: null,
 };
 
-// User Reducer
+// User details Reducer
 const userReducer = (state = initialState, action) => {
   switch (action.type) {
-    case SET_USER_NAME:
+    case SET_USER_DETAILS:
       return {
         ...state,
         users: action.payload,

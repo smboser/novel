@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
 import { setUserDetails } from "../redux/actions/userActions";
 
 export const LoginPage = () => {
-  const [companyPassword, setCompanyPassword] = useState("");
+  const [companyPassword, setCompanyPassword] = useState("$seelySensors18340932");
   const [rememberMe, setRememberMe] = useState(false);
   const [isVisible, setVisible] = useState(false);
   const [isLoaderVisible, setLoaderVisible] = useState(false);
