@@ -12,6 +12,7 @@ function App() {
     <AuthProvider>
       <Routes>
         <Route path="/" element={<LoginPage />} />
+        <Route path="*" element={<LoginPage />} />
         <Route
           path="/devices"
           element={

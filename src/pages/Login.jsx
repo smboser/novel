@@ -2,6 +2,11 @@ import { useState, useRef } from "react";
 import { CirclesWithBar } from "react-loader-spinner";
 import { userLogin } from "../helper/web-service";
 import { useAuth } from "../hooks/useAuth";
+
+// Import redux and actions
+import { connect } from 'react-redux';
+import { setUserName } from "../../actions";
+
 export const LoginPage = () => {
   const [companyPassword, setCompanyPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
@@ -104,3 +109,16 @@ export const LoginPage = () => {
 
   );
 };
+
+// mapStateToProps
+const mapStateToProps = (state) => ({
+  users: state.users, // Adjust according to your state shape
+});
+
+// mapDispatchToProps
+const mapDispatchToProps = (dispatch) => ({
+  setUserName: (data) => dispatch(setUserName(data)), // Use the correct action creator
+});
+
+// Connect component to Redux
+export default connect(mapStateToProps, mapDispatchToProps)(LoginPage);
