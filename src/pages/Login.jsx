@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { CirclesWithBar } from "react-loader-spinner";
 import { userLogin } from "../helper/web-service";
 import { useAuth } from "../hooks/useAuth";
@@ -7,13 +7,19 @@ import { useAuth } from "../hooks/useAuth";
 import { connect } from 'react-redux';
 import { setUserDetails } from "../redux/actions/userActions";
 
-export const LoginPage = () => {
+
+export const LoginPage = (props) => {
   const [companyPassword, setCompanyPassword] = useState("$seelySensors18340932");
   const [rememberMe, setRememberMe] = useState(false);
   const [isVisible, setVisible] = useState(false);
   const [isLoaderVisible, setLoaderVisible] = useState(false);
   const {setUserData} = useAuth();
   const inputCompanyPasswordReference = useRef(null);
+
+  
+  useEffect(()=>{
+    console.log("props-----", props)
+  });
 
   // Handler for login
   const handleLogin = async (e) => {
@@ -29,6 +35,8 @@ export const LoginPage = () => {
       let base64Password = btoa(companyPassword);
       // Call API for login and getting data
       let data = await userLogin(base64Password);
+      // console.log("data----", data);
+      props.setUserDetails(data)
       // Set user data
       setLoaderVisible(false);
       await setUserData(data);
@@ -112,12 +120,15 @@ export const LoginPage = () => {
 
 // mapStateToProps
 const mapStateToProps = (state) => ({
-  users: state.users, // Adjust according to your state shape
+  userDetails: state.userDetails, // Adjust according to your state shape
 });
 
 // mapDispatchToProps
 const mapDispatchToProps = (dispatch) => ({
-  setUserDetails: (data) => dispatch(setUserDetails(data)), // Use the correct action creator
+  setUserDetails: (data) => {
+    console.log('Dispatching setUserDetails with:', data); // Debugging line
+    dispatch(setUserDetails(data));
+  },
 });
 
 // Connect component to Redux

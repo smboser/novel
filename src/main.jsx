@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from "react-query";
 
 // Import provider and store
 import { Provider } from 'react-redux';
-import store from "./redux/store"
+import store from "./redux/store";
 
 const queryClient = new QueryClient();
 

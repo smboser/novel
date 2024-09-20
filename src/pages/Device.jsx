@@ -7,7 +7,13 @@ import { DeviceModel } from "../components/device_model";
 import { useAuth } from "../hooks/useAuth";
 import { getDevices } from "../helper/web-service";
 import { differenceDate } from "../helper/utils";
-export const DevicePage = () => {
+
+// Import redux and actions
+import { connect } from 'react-redux';
+import { setUserDetails } from "../redux/actions/userActions";
+
+
+export const DevicePage = (props) => {
   const { user } = useAuth();
   const [isLoaderVisible, setLoaderVisible] = useState(false);
   const [selectedDevice, setSelectedDevice] = useState(null);
@@ -18,6 +24,8 @@ export const DevicePage = () => {
   const [deviceTypes, setDeviceTypes] = useState([]);
 
   useEffect(() => {
+    console.log("props-----", props)
+
     setLoaderVisible(true);
     getDevices(user)
       .then((data) => {
@@ -144,3 +152,19 @@ export const DevicePage = () => {
     </>
   );
 };
+
+// mapStateToProps
+const mapStateToProps = (state) => ({
+  userDetails: state.userDetails, // Adjust according to your state shape
+});
+
+// mapDispatchToProps
+const mapDispatchToProps = (dispatch) => ({
+  setUserDetails: (data) => {
+    console.log('Dispatching setUserDetails with:', data); // Debugging line
+    dispatch(setUserDetails(data));
+  },
+});
+
+// Connect component to Redux
+export default connect(mapStateToProps, mapDispatchToProps)(DevicePage);
