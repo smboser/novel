@@ -3,12 +3,11 @@ import { CirclesWithBar } from "react-loader-spinner";
 import { userLogin } from "../helper/web-service";
 import { useAuth } from "../hooks/useAuth";
 
-// Import redux and actions
+// Connect with Redux and import and actions
 import { connect } from 'react-redux';
 import { setUserDetails } from "../redux/actions/userActions";
-import { addTodo, removeTodo } from "../redux/actions";
 
-const Login = (props) => {
+export const Login = (props) => {
   const [companyPassword, setCompanyPassword] = useState("$seelySensors18340932");
   const [rememberMe, setRememberMe] = useState(false);
   const [isVisible, setVisible] = useState(false);
@@ -16,19 +15,9 @@ const Login = (props) => {
   const {setUserData} = useAuth();
   const inputCompanyPasswordReference = useRef(null);
 
-
-  const [inputValue, setInputValue] = useState('');
-  const handleAddTodo = () => {
-    if (inputValue.trim()) {
-      props.addTodo(inputValue);
-      setInputValue('');
-    }
-  };
-  
   useEffect(()=>{
     console.log("props-----", props)
   },[props]);
-
 
   // Handler for login
   const handleLogin = async (e) => {
@@ -44,8 +33,7 @@ const Login = (props) => {
       let base64Password = btoa(companyPassword);
       // Call API for login and getting data
       let data = await userLogin(base64Password);
-      // console.log("data----", data);
-      // props.setUserDetails(data)
+      props.setUserDetails(data)
       // Set user data
       setLoaderVisible(false);
       await setUserData(data);
@@ -73,28 +61,6 @@ const Login = (props) => {
         visible={isLoaderVisible}
       />
       <div className="formbodymain">
-
-
-      {/* <div>
-        <h1>Todo List</h1>
-        <input
-          type="text"
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          placeholder="Add a new todo"
-        />
-        <button onClick={handleAddTodo}>Add Todo</button>
-        <ul>
-          {props.todos.map(todo => (
-            <li key={todo.id}>
-              {todo.text} 
-              <button onClick={() => props.removeTodo(todo.id)}>Remove</button>
-            </li>
-          ))}
-        </ul>
-      </div> */}
-    
-
         <div className="row">
           <div className="col-md-9 col-sm-9 col-xs-12">
             <div className="ttl_main"></div>
@@ -151,17 +117,12 @@ const Login = (props) => {
 
 // mapStateToProps
 const mapStateToProps = (state) => ({
-  // userDetails: state.userDetails, // Adjust according to your state shape
-  todos: state.todos.todos,
+  userDetails: state.users.userDetails, // Ensure the correct path to userDetails
 });
-
 
 // mapDispatchToProps
 const mapDispatchToProps = (dispatch) => ({
-  setUserDetails: (data) => {
-    console.log('Dispatching setUserDetails with:', data); // Debugging line
-    dispatch(setUserDetails(data));
-  },
+  setUserDetails: (data) => dispatch(setUserDetails(data)),
 });
 
 // Connect component to Redux
