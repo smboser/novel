@@ -6,9 +6,9 @@ import { useAuth } from "../hooks/useAuth";
 // Import redux and actions
 import { connect } from 'react-redux';
 import { setUserDetails } from "../redux/actions/userActions";
+import { addTodo, removeTodo } from "../redux/actions";
 
-
-export const LoginPage = (props) => {
+const Login = (props) => {
   const [companyPassword, setCompanyPassword] = useState("$seelySensors18340932");
   const [rememberMe, setRememberMe] = useState(false);
   const [isVisible, setVisible] = useState(false);
@@ -16,10 +16,19 @@ export const LoginPage = (props) => {
   const {setUserData} = useAuth();
   const inputCompanyPasswordReference = useRef(null);
 
+
+  const [inputValue, setInputValue] = useState('');
+  const handleAddTodo = () => {
+    if (inputValue.trim()) {
+      props.addTodo(inputValue);
+      setInputValue('');
+    }
+  };
   
   useEffect(()=>{
     console.log("props-----", props)
-  });
+  },[props]);
+
 
   // Handler for login
   const handleLogin = async (e) => {
@@ -36,7 +45,7 @@ export const LoginPage = (props) => {
       // Call API for login and getting data
       let data = await userLogin(base64Password);
       // console.log("data----", data);
-      props.setUserDetails(data)
+      // props.setUserDetails(data)
       // Set user data
       setLoaderVisible(false);
       await setUserData(data);
@@ -64,6 +73,28 @@ export const LoginPage = (props) => {
         visible={isLoaderVisible}
       />
       <div className="formbodymain">
+
+
+      {/* <div>
+        <h1>Todo List</h1>
+        <input
+          type="text"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          placeholder="Add a new todo"
+        />
+        <button onClick={handleAddTodo}>Add Todo</button>
+        <ul>
+          {props.todos.map(todo => (
+            <li key={todo.id}>
+              {todo.text} 
+              <button onClick={() => props.removeTodo(todo.id)}>Remove</button>
+            </li>
+          ))}
+        </ul>
+      </div> */}
+    
+
         <div className="row">
           <div className="col-md-9 col-sm-9 col-xs-12">
             <div className="ttl_main"></div>
@@ -120,8 +151,10 @@ export const LoginPage = (props) => {
 
 // mapStateToProps
 const mapStateToProps = (state) => ({
-  userDetails: state.userDetails, // Adjust according to your state shape
+  // userDetails: state.userDetails, // Adjust according to your state shape
+  todos: state.todos.todos,
 });
+
 
 // mapDispatchToProps
 const mapDispatchToProps = (dispatch) => ({
@@ -132,4 +165,4 @@ const mapDispatchToProps = (dispatch) => ({
 });
 
 // Connect component to Redux
-export default connect(mapStateToProps, mapDispatchToProps)(LoginPage);
+export default connect(mapStateToProps, mapDispatchToProps)(Login);

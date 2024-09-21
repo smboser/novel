@@ -7,6 +7,9 @@ import { SurveyPage } from "./pages/SurveyPage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AuthProvider } from "./hooks/useAuth";
 import "./App.css";
+
+
+
 function App() {
   return (
     <AuthProvider>
