@@ -46,7 +46,7 @@ export const SurveyPage = () => {
                         height="500"
                         width={"100%"}
                         style={{ border: "0px" }}
-                        src="https://docs.google.com/spreadsheets/d/1AorkoDXY2A3Zmwb_c5MYGlUrCyeKKZ8mig_Fm8nA6Xw/edit?embedded=true&amp;rm=demo&amp;gid=1108599173&amp;headers=false#gid=1108599173"
+                        src="https://docs.google.com/spreadsheets/d/1vTZpGTFO13YpA9ccLiqDF0adP2fN08POltMOum2sQPY/edit?embedded=true&amp;rm=demo&amp;gid=1108599173&amp;headers=false#gid=1108599173"
                       ></iframe>
                     </div>
                   </div>
@@ -56,7 +56,7 @@ export const SurveyPage = () => {
           </div>
         </div>
       </div>
-      <Footer/>
+      <Footer />
     </>
   );
 };
