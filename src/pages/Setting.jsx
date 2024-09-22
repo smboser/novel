@@ -183,9 +183,10 @@ export const SettingPage = () => {
         return;
       }
 
-      await axios.post(apiSaveUrl, { settings: filteredSettings });
-      toast.success("Settings saved successfully!");
-      setShowSuccMsg(true);
+      // TODO: Need to enable when save mode is ON
+      // await axios.post(apiSaveUrl, { settings: filteredSettings });
+      // toast.success("Settings saved successfully!");
+      // setShowSuccMsg(true);
       setLoaderVisible(false);
     } catch (err) {
       toast.error("Error saving settings. Please try again.");
@@ -451,7 +452,9 @@ export const SettingPage = () => {
                     variant="contained"
                     color="primary"
                     style={{ color: "#ffffff", verticalAlign: "middle" }}
-                    disabled={isLoaderVisible}
+                    // TODO: Need to enable when save mode is ON
+                    //disabled={isLoaderVisible}
+                    disabled={true}
                     className={`btn btn-success btn-block ${styles.save_btn}`}
                   >
                     {isLoaderVisible ? "Saving..." : "Save"}
@@ -462,7 +465,7 @@ export const SettingPage = () => {
                         className="dev_ttlmain"
                         style={{ paddingTop: "5px" }}
                       >
-                        Should autosave as well on change...
+                        {/* TODO: Need to enable when save mode is ON | Should autosave as well on change... */}
                         {showSuccMsg ? (
                           <span className={styles.succ_msg}>
                             Settings saved successfully

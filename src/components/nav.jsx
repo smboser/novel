@@ -2,14 +2,16 @@ import { NavLink } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { APP_CONST } from "../helper/application-constant";
 export const Navbar = () => {
-  const { user,removeUserData  } = useAuth();
+  const { user, removeUserData } = useAuth();
   const farmer_companies = APP_CONST.farmer_companies;
   const orgName = user.orgName;
-  const orgIcon = (farmer_companies.includes(orgName)) ? "images/logomain.png" : user.orgDetails.icon;
+  const orgIcon = farmer_companies.includes(orgName)
+    ? "images/logomain.png"
+    : user.orgDetails.icon;
   const handleLogout = (event) => {
-    console.log("--- Inside handleLogout ---")
+    console.log("--- Inside handleLogout ---");
     removeUserData();
-};
+  };
   return (
     <nav className="navbar navbar-default">
       <div className="container-fluid">
@@ -28,7 +30,13 @@ export const Navbar = () => {
             <span className="icon-bar"></span>
           </button>
           <a className="navbar-brand" href="/devices">
-            <img src={orgIcon} className="orglog" />
+            {/*// TODO: Need to enable when save mode is ON*/}
+            {/* <img src={orgIcon} className="orglog" /> */}
+            <img
+              src="https://anixsoft.co.in/wp-content/uploads/2017/08/logo-icon.png"
+              className="orglog"
+              style={{ height: "40px", width: "80px" }}
+            />
           </a>
         </div>
         {/* Collect the nav links, forms, and other content for toggling */}
@@ -46,17 +54,27 @@ export const Navbar = () => {
             <li>
               <NavLink to="/setting">Setting</NavLink>
             </li>
-            <li style={{"display": (farmer_companies.includes(orgName) ? "none":"block")}}>
+            <li
+              style={{
+                display: farmer_companies.includes(orgName) ? "none" : "block",
+              }}
+            >
               <NavLink to="/survey">Occupant Survey</NavLink>
             </li>
           </ul>
           <ul className="nav navbar-nav navbar-right">
-            <li style={{"marginTop":"10px"}}>
-              <button type="button" className="btn btn-info btn-sm" onClick={handleLogout}>Logout</button>
+            <li style={{ marginTop: "10px" }}>
+              <button
+                type="button"
+                className="btn btn-info btn-sm"
+                onClick={handleLogout}
+              >
+                Logout
+              </button>
             </li>
           </ul>
         </div>
       </div>
-    </nav >
+    </nav>
   );
 };
