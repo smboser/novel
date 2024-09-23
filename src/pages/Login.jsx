@@ -3,7 +3,7 @@ import { CirclesWithBar } from "react-loader-spinner";
 import { userLogin } from "../helper/web-service";
 import { useAuth } from "../hooks/useAuth";
 
-// Connect with Redux and import and actions
+// Connect with Redux and import and require actions
 import { connect } from 'react-redux';
 import { setUserDetails } from "../redux/actions/userActions";
 
@@ -14,10 +14,6 @@ export const Login = (props) => {
   const [isLoaderVisible, setLoaderVisible] = useState(false);
   const {setUserData} = useAuth();
   const inputCompanyPasswordReference = useRef(null);
-
-  useEffect(()=>{
-    console.log("props-----", props)
-  },[props]);
 
   // Handler for login
   const handleLogin = async (e) => {

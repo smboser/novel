@@ -16,7 +16,11 @@ import styles from "./SettingPage.module.css";
 import { toast, Toaster } from "react-hot-toast";
 import { CirclesWithBar } from "react-loader-spinner";
 
-export const SettingPage = () => {
+// Connect with Redux and import and require actions
+import { connect } from 'react-redux';
+import { setUserDetails } from "../redux/actions/userActions";
+
+export const Setting = (props) => {
   const { user } = useAuth();
   const [settings, setSettings] = useState([]);
   const [isLoaderVisible, setLoaderVisible] = useState(false);
@@ -490,3 +494,16 @@ export const SettingPage = () => {
     </>
   );
 };
+
+// mapStateToProps
+const mapStateToProps = (state) => ({
+  userDetails: state.users.userDetails, // Ensure the correct path to userDetails
+});
+
+// mapDispatchToProps
+const mapDispatchToProps = (dispatch) => ({
+  setUserDetails: (data) => dispatch(setUserDetails(data)),
+});
+
+// Connect component to Redux
+export default connect(mapStateToProps, mapDispatchToProps)(Setting);

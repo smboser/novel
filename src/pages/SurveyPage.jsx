@@ -3,7 +3,11 @@ import { Navbar } from "../components/nav";
 import { Footer } from "../components/footer";
 import { CirclesWithBar } from "react-loader-spinner";
 
-export const SurveyPage = () => {
+// Connect with Redux and import and require actions
+import { connect } from 'react-redux';
+import { setUserDetails } from "../redux/actions/userActions";
+
+export const SurveyPage = (props) => {
   const [isLoaderVisible, setLoaderVisible] = useState(true);
   useEffect(() => {
     setTimeout(() => {
@@ -60,3 +64,16 @@ export const SurveyPage = () => {
     </>
   );
 };
+
+// mapStateToProps
+const mapStateToProps = (state) => ({
+  userDetails: state.users.userDetails, // Ensure the correct path to userDetails
+});
+
+// mapDispatchToProps
+const mapDispatchToProps = (dispatch) => ({
+  setUserDetails: (data) => dispatch(setUserDetails(data)),
+});
+
+// Connect component to Redux
+export default connect(mapStateToProps, mapDispatchToProps)(SurveyPage);

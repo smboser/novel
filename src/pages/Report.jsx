@@ -12,7 +12,12 @@ import { DeviceList } from "../components/deviceList";
 import { AlertAdvisories } from "../components/alert_advisories";
 import { DetailedAnalytics } from "../components/detailed_analytics";
 import { filterLatestAlerts, getOrganizedAdvisorySettings, getParameters } from "../helper/utils";
-export const ReportPage = () => {
+
+// Connect with Redux and import and require actions
+import { connect } from 'react-redux';
+import { setUserDetails } from "../redux/actions/userActions";
+
+export const Report = (props) => {    
     const { user } = useAuth();
     const [isLoaderVisible, setLoaderVisible] = useState(false);
     const [settings, setSettings] = useState([]);
@@ -206,3 +211,16 @@ export const ReportPage = () => {
         </>
     );
 };
+
+// mapStateToProps
+const mapStateToProps = (state) => ({
+    userDetails: state.users.userDetails, // Ensure the correct path to userDetails
+  });
+  
+  // mapDispatchToProps
+  const mapDispatchToProps = (dispatch) => ({
+    setUserDetails: (data) => dispatch(setUserDetails(data)),
+  });
+  
+  // Connect component to Redux
+  export default connect(mapStateToProps, mapDispatchToProps)(Report);
