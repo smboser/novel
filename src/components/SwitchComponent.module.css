@@ -8,3 +8,27 @@
 .timPicker li {
   font-size: 12px;
 }
+.table th,
+.table td,
+.table tr {
+  vertical-align: middle !important;
+  padding: 5px !important;
+  text-align: center;
+}
+
+.table td span {
+  line-height: 100% !important;
+}
+.table td {
+  border: 1px solid #ddd;
+}
+.table td input {
+  /* font-size: 1.4em !important; */
+  width: 100px;
+}
+.settings_input input {
+  padding: 2px 0 0 15px !important;
+}
+.settings_input fieldset {
+  top: -13px;
+}

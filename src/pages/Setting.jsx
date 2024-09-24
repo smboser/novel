@@ -15,6 +15,8 @@ import {
 import styles from "./SettingPage.module.css";
 import { toast, Toaster } from "react-hot-toast";
 import { CirclesWithBar } from "react-loader-spinner";
+import SwitchComponent from "../components/SwitchComponent";
+import { APP_CONST } from "../helper/application-constant";
 
 export const SettingPage = () => {
   const { user } = useAuth();
@@ -26,6 +28,8 @@ export const SettingPage = () => {
   const [isEligibleForSave, setIsEligibleForSave] = useState(false);
   const [errors, setErrors] = useState({});
 
+  const farmer_companies = APP_CONST.farmer_companies;
+  const orgName = user.orgName;
   // Fetch data inside the component
   const fetchAlertData = async () => {
     const apiUrl = getAdvisorySettings(user);
@@ -241,16 +245,29 @@ export const SettingPage = () => {
         wrapperClass="loader"
         visible={isLoaderVisible}
       />
-      <Navbar />
       <div className="formbodymain">
         <div className="row">
+          <div className="col-md-12 col-sm-12 col-xs-12">
+            <Navbar />
+          </div>
+
+          {farmer_companies.includes(orgName) ? (
+            <div className="col-md-12 col-sm-12 col-xs-12">
+              <SwitchComponent />
+            </div>
+          ) : (
+            ""
+          )}
+
           <div className="col-md-12 col-sm-12 col-xs-12"></div>
           <div className="">
             <div className="col-md-12 col-sm-12 col-xs-12 report" id="style-3">
               <div className="x_panel">
                 <div className="col-md-12 col-sm-12 col-xs-12">
-                  <div className="ttl_main center">
-                    <h2 style={{ textAlign: "center" }}>Advisory Setting</h2>
+                  <div className="ttl_main">
+                    <h2>
+                      <strong>Advisory Setting</strong>
+                    </h2>
                   </div>
                 </div>
                 <div className="row">

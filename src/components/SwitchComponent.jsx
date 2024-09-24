@@ -63,7 +63,7 @@ const SampleTable = () => {
     <div className="col-md-12 col-sm-12 col-xs-12">
       <div className="x_panel">
         <div className="ttl_main">
-          <h2>
+          <h2 style={{ paddingTop: "2px" }}>
             <strong>Device Settings</strong>
           </h2>
         </div>
@@ -71,43 +71,52 @@ const SampleTable = () => {
           <div className="row">
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <TableContainer component={Paper} className={styles.deviceTable}>
-                <Table aria-label="simple table">
+                <Table aria-label="simple table" className={styles.table}>
                   <TableHead>
                     <TableRow>
-                      <TableCell>Switch</TableCell>
-                      <TableCell>Text</TableCell>
-                      <TableCell>Checkbox</TableCell>
-                      <TableCell>Start Time</TableCell>
-                      <TableCell>End Time</TableCell>
+                      <TableCell>Active</TableCell>
+                      <TableCell>Device</TableCell>
+                      <TableCell>Auto</TableCell>
+                      <TableCell>Turn on Time</TableCell>
+                      <TableCell>Turn off Time</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {rows.map((row) => (
                       <TableRow key={row.id}>
-                        <TableCell>
-                          <Switch
+                        <TableCell className={styles.settings_input}>
+                          {/* <Switch
                             checked={row.enabled}
                             onChange={() => handleSwitchChange(row.id)}
                             color="primary"
-                          />
+                          /> */}
+                          <label className="switch">
+                            <input
+                              type="checkbox"
+                              checked={row.enabled}
+                              onChange={() => handleSwitchChange(row.id)}
+                            />
+                            <span className="slider round"></span>
+                          </label>
                         </TableCell>
+
                         <TableCell>
+                          <div dangerouslySetInnerHTML={{ __html: row.text }} />
+                        </TableCell>
+                        <TableCell className={styles.settings_input}>
                           <Checkbox
                             checked={row.checked}
                             onChange={() => handleCheckboxChange(row.id)}
                             color="primary"
                           />
                         </TableCell>
-                        <TableCell>
-                          <div dangerouslySetInnerHTML={{ __html: row.text }} />
-                        </TableCell>
-                        <TableCell>
+                        <TableCell className={styles.settings_input}>
                           <DesktopTimePicker
                             defaultValue={dayjs("2022-04-17T15:30")}
                             className={styles.timPicker}
                           />
                         </TableCell>
-                        <TableCell>
+                        <TableCell className={styles.settings_input}>
                           <DesktopTimePicker
                             defaultValue={dayjs("2022-04-17T15:30")}
                             className={styles.timPicker}

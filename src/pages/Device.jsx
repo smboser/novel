@@ -4,11 +4,10 @@ import * as MaterialDesign from "react-icons/md";
 import { Navbar } from "../components/nav";
 import { Footer } from "../components/footer";
 import { DeviceModel } from "../components/device_model";
-import SwitchComponent from "../components/SwitchComponent";
 import { useAuth } from "../hooks/useAuth";
 import { getDevices } from "../helper/web-service";
 import { differenceDate } from "../helper/utils";
-import { APP_CONST } from "../helper/application-constant";
+
 export const DevicePage = () => {
   const { user } = useAuth();
   const [isLoaderVisible, setLoaderVisible] = useState(false);
@@ -18,9 +17,6 @@ export const DevicePage = () => {
   const [orgDevices, setOrgDevices] = useState([]);
   const [devices, setDevices] = useState([]);
   const [deviceTypes, setDeviceTypes] = useState([]);
-
-  const farmer_companies = APP_CONST.farmer_companies;
-  const orgName = user.orgName;
 
   useEffect(() => {
     setLoaderVisible(true);
@@ -67,19 +63,13 @@ export const DevicePage = () => {
           <div className="col-md-12 col-sm-12 col-xs-12">
             <Navbar />
           </div>
-          {farmer_companies.includes(orgName) ? (
-            <div className="col-md-12 col-sm-12 col-xs-12">
-              <SwitchComponent />
-            </div>
-          ) : (
-            ""
-          )}
+
           <div className="col-md-12 col-sm-12 col-xs-12">
             <div className="x_panel">
               <div className="col-md-12 col-sm-12 col-xs-12">
                 <div className="ttl_main">
                   <h2>
-                    <strong>Devices</strong>
+                    <strong>Device Settings</strong>
                   </h2>
                 </div>
                 <div className="row">
