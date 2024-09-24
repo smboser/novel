@@ -1,0 +1,10 @@
+.deviceTable td div {
+  font-size: 13px;
+}
+.deviceTable th {
+  font-size: 13px;
+  font-weight: bold;
+}
+.timPicker li {
+  font-size: 12px;
+}

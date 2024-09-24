@@ -4,9 +4,11 @@ import * as MaterialDesign from "react-icons/md";
 import { Navbar } from "../components/nav";
 import { Footer } from "../components/footer";
 import { DeviceModel } from "../components/device_model";
+import SwitchComponent from "../components/SwitchComponent";
 import { useAuth } from "../hooks/useAuth";
 import { getDevices } from "../helper/web-service";
 import { differenceDate } from "../helper/utils";
+import { APP_CONST } from "../helper/application-constant";
 export const DevicePage = () => {
   const { user } = useAuth();
   const [isLoaderVisible, setLoaderVisible] = useState(false);
@@ -17,36 +19,38 @@ export const DevicePage = () => {
   const [devices, setDevices] = useState([]);
   const [deviceTypes, setDeviceTypes] = useState([]);
 
+  const farmer_companies = APP_CONST.farmer_companies;
+  const orgName = user.orgName;
+
   useEffect(() => {
     setLoaderVisible(true);
-    getDevices(user)
-      .then((data) => {
-          let devices = data.value;
-          let dTypes = [...new Set(devices.map(device => device.deviceType))];
-          setDevices(devices);
-          setOrgDevices(devices);
-          setDeviceTypes(dTypes);
-          setLoaderVisible(false);
-      });
+    getDevices(user).then((data) => {
+      let devices = data.value;
+      let dTypes = [...new Set(devices.map((device) => device.deviceType))];
+      setDevices(devices);
+      setOrgDevices(devices);
+      setDeviceTypes(dTypes);
+      setLoaderVisible(false);
+    });
   }, []);
 
   const handleChange = (event) => {
-        let type = event.target.value;
-        let deves = orgDevices.filter((device) => {
-          if (type) {
-            return device.deviceType === type;
-          } else {
-            return true;
-          }
-        });
-        setDevices(deves);
-        setSelectedDeviceType(event.target.value);
+    let type = event.target.value;
+    let deves = orgDevices.filter((device) => {
+      if (type) {
+        return device.deviceType === type;
+      } else {
+        return true;
+      }
+    });
+    setDevices(deves);
+    setSelectedDeviceType(event.target.value);
   };
 
   const handleModelClose = (event) => {
-      event.stopPropagation();
-      event.preventDefault();
-      setOpen(false);
+    event.stopPropagation();
+    event.preventDefault();
+    setOpen(false);
   };
 
   return (
@@ -63,11 +67,20 @@ export const DevicePage = () => {
           <div className="col-md-12 col-sm-12 col-xs-12">
             <Navbar />
           </div>
+          {farmer_companies.includes(orgName) ? (
+            <div className="col-md-12 col-sm-12 col-xs-12">
+              <SwitchComponent />
+            </div>
+          ) : (
+            ""
+          )}
           <div className="col-md-12 col-sm-12 col-xs-12">
             <div className="x_panel">
               <div className="col-md-12 col-sm-12 col-xs-12">
                 <div className="ttl_main">
-                  <h2><strong>Devices</strong></h2>
+                  <h2>
+                    <strong>Devices</strong>
+                  </h2>
                 </div>
                 <div className="row">
                   <div className="col-md-6 col-sm-6 col-xs-6">
@@ -76,12 +89,14 @@ export const DevicePage = () => {
                     </p>
                   </div>
                   <div className="col-md-6 col-sm-6 col-xs-6 txtrgt">
-                    <select
-                      value={selectedDeviceType}
-                      onChange={handleChange}>
+                    <select value={selectedDeviceType} onChange={handleChange}>
                       <option value="">Filter Device Type</option>
                       {deviceTypes.map((type, i) => {
-                        return (<option value={type} key={i}>{type}</option>)
+                        return (
+                          <option value={type} key={i}>
+                            {type}
+                          </option>
+                        );
                       })}
                     </select>
                   </div>
@@ -100,29 +115,43 @@ export const DevicePage = () => {
                   </thead>
                   <tbody>
                     {devices.map((device, i) => {
-                      let delta = differenceDate(new Date(device.lastUpdate), new Date());
+                      let delta = differenceDate(
+                        new Date(device.lastUpdate),
+                        new Date()
+                      );
                       return (
                         <tr key={i}>
-                          <td><MaterialDesign.MdAir color="#00bdd5"  size={20}/> {device.devName}</td>
+                          <td>
+                            <MaterialDesign.MdAir color="#00bdd5" size={20} />{" "}
+                            {device.devName}
+                          </td>
                           <td>{delta}</td>
                           <td>{device.deviceType}</td>
                           <th>
-                            <img src="images/eye.jpg" data-device={JSON.stringify(device)} onClick={(event) => {
-                              event.stopPropagation();
-                              event.preventDefault();
-                              let device = null;
-                              try {
-                                device = JSON.parse(event.target.getAttribute("data-device"));
-                              } catch (err) {
-                                console.log("Error occurred to parse the data-device")
-                              }
-                              setOpen(true);
-                              setSelectedDevice(device);
-                            }} />
+                            <img
+                              src="images/eye.jpg"
+                              data-device={JSON.stringify(device)}
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                event.preventDefault();
+                                let device = null;
+                                try {
+                                  device = JSON.parse(
+                                    event.target.getAttribute("data-device")
+                                  );
+                                } catch (err) {
+                                  console.log(
+                                    "Error occurred to parse the data-device"
+                                  );
+                                }
+                                setOpen(true);
+                                setSelectedDevice(device);
+                              }}
+                            />
                           </th>
                           <td></td>
                         </tr>
-                      )
+                      );
                     })}
                   </tbody>
                 </table>
@@ -131,16 +160,16 @@ export const DevicePage = () => {
           </div>
         </div>
       </div>
-      {
-        (selectedDevice != null)
-          ? <DeviceModel
-            isOpen={isOpen}
-            closeModel={handleModelClose}
-            device={selectedDevice}
-          />
-          : ""
-      }
-      <Footer/>
+      {selectedDevice != null ? (
+        <DeviceModel
+          isOpen={isOpen}
+          closeModel={handleModelClose}
+          device={selectedDevice}
+        />
+      ) : (
+        ""
+      )}
+      <Footer />
     </>
   );
 };
