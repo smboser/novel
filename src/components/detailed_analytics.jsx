@@ -85,7 +85,7 @@ export const DetailedAnalytics = ({ settings, devices, selectedDevices, series, 
     return (
         <>
             <div className="row">
-                <div className="col-md-1 col-sm-2 col-xs-12">
+                <div className="col-xs-12">
                     <select
                         name="hourly_filter"
                         value={selectedHourly}
@@ -96,18 +96,18 @@ export const DetailedAnalytics = ({ settings, devices, selectedDevices, series, 
                         <option value="last_48_hour">Last 48 hours</option>
                         <option value="last_week">Last Week</option>
                     </select>
-                </div>
-                <div className="col-md-11 col-sm-3 col-xs-12 chtsel" style={{"paddingLeft":"25px"}}>
+
                     <select
                         name="type_filter"
                         value={selectedParam}
-                        onChange={handleParamFilterChange}>
+                        onChange={handleParamFilterChange}
+                        style={{"marginLeft":"10px"}}>
                         {Object.keys(settings).map((setname, i) => {
                             let setting = settings[setname];
                             return (
                                 <option key={i} value={setting.parameter}>{setting.name}</option>
                             )
-                        })};
+                        })}
                     </select>
                 </div>
             </div>

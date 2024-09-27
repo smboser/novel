@@ -23,7 +23,6 @@ export const GaugeChart = ({ setting, selectedDevices, last24HoursData }) => {
   console.log(`Values of avg :${avg}`);
   const { user } = useAuth();
   const farmer_companies = APP_CONST.farmer_companies;
-  const orgName = user.orgName;
 
   return (
     <>
@@ -87,10 +86,7 @@ export const GaugeChart = ({ setting, selectedDevices, last24HoursData }) => {
       </div>
 
       <div className="reading_gauge">
-        {avg}{" "}
-        {(setting.unit === "milibar") & farmer_companies.includes(orgName)
-          ? "kpa"
-          : setting.unit}
+        {avg}{" "} {setting.unit}
       </div>
     </>
   );
