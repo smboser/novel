@@ -89,14 +89,14 @@ export const LoginPage = () => {
                 </div>
                 <div className="form-group">
                   <div className="col-md-12 col-sm-12 col-xs-12">
-                    <input
+                    {/* <input
                       type="checkbox"
                       id="rememberMe"
                       defaultChecked={rememberMe}
                       onChange={(e) => setRememberMe(e.target.checked)}
                     />
                     &nbsp;
-                    <label> Remember me</label>
+                    <label> Remember me</label> */}
                     <br />
                     <button
                       type="button"
