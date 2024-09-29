@@ -75,14 +75,12 @@ export const filterLatestAlerts = (data) => {
   return filteredData;
 };
 
-export const getParameters = () => {
-  const parameters = APP_CONST.parameters.reduce((acc, parameter) => {
-    if (!acc[parameter.key]) {
-      acc[parameter.key] = {
-        name: parameter.name,
-        min_value: parameter.min_value,
-        max_value: parameter.max_value,
-        unit: parameter.unit
+export const getOrganizedParameters = (data) => {
+  const parameters = data.value.reduce((acc, param) => {
+    if (!acc[param.parameter] && param.parameter != "leakage_status") {
+      acc[param.parameter] = {
+        name: param.paramDisplayName,
+        unit: param.unit
       };
     }
     return acc;
@@ -93,23 +91,25 @@ export const getParameters = () => {
 
 export const getOrganizedAdvisorySettings = (data, parameters) => {
   const advisorySettings = data.reduce((acc, alert) => {
-    if (!acc[alert.parameter] && alert.active) {
-      let param = parameters[alert.parameter];
-      let curObj = {
-        lt: "",
-        gt: "",
-        active: alert.active,
-        parameter: alert.parameter,
-        orgName: alert.orgName,
-        min_value: alert.min,
-        max_value: alert.max
-      };
-      acc[alert.parameter] = {...param, ...curObj};
-    }
-    if (alert.func === "lt" && alert.active) {
-      acc[alert.parameter].lt = alert.level || "";
-    } else if (alert.func === "gt" && alert.active) {
-      acc[alert.parameter].gt = alert.level || "";
+    if (parameters[alert.parameter]) {
+      if (!acc[alert.parameter] && alert.active) {
+          let param = parameters[alert.parameter];
+          let curObj = {
+              lt: "",
+              gt: "",
+              active: alert.active,
+              parameter: alert.parameter,
+              orgName: alert.orgName,
+              min_value: alert.min,
+              max_value: alert.max
+          };
+          acc[alert.parameter] = { ...param, ...curObj };
+      }
+      if (alert.func === "lt" && alert.active) {
+        acc[alert.parameter].lt = alert.level || "";
+      } else if (alert.func === "gt" && alert.active) {
+        acc[alert.parameter].gt = alert.level || "";
+      }
     }
     return acc;
   }, {});
@@ -120,10 +120,10 @@ export const getOrganizedAdvisorySettings = (data, parameters) => {
 export const calculateAvgLatestData = (latestData, parameter, selectedDevices) => {
   let total = 0, count = 0;
   Object.keys(latestData).forEach(devname => {
-      if (typeof(latestData[devname][parameter]) != "undefined" && selectedDevices.includes(devname)) {
-          total += latestData[devname][parameter];
-          count += 1;
-      }
+    if (typeof (latestData[devname][parameter]) != "undefined" && selectedDevices.includes(devname)) {
+      total += latestData[devname][parameter];
+      count += 1;
+    }
   });
-  return (count > 0) ?  Math.floor(total /count) : 0;
+  return (count > 0) ? Math.floor(total / count) : 0;
 }

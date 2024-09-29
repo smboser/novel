@@ -4,14 +4,14 @@ import { CirclesWithBar } from "react-loader-spinner";
 import "react-multi-carousel/lib/styles.css";
 import { useAuth } from "../hooks/useAuth";
 import { APP_CONST } from "../helper/application-constant";
-import { getSensorData, getAdvisorySettingData } from "../helper/web-service";
+import { getSensorData, getAdvisorySettingData, getParameters } from "../helper/web-service";
 import { Navbar } from "../components/nav";
 import { Footer } from "../components/footer";
 import { AvgParameters } from "../components/avg_parameters";
 import { DeviceList } from "../components/deviceList";
 import { AlertAdvisories } from "../components/alert_advisories";
 import { DetailedAnalytics } from "../components/detailed_analytics";
-import { filterLatestAlerts, getOrganizedAdvisorySettings, getParameters } from "../helper/utils";
+import { filterLatestAlerts, getOrganizedAdvisorySettings, getOrganizedParameters } from "../helper/utils";
 export const ReportPage = () => {
     const { user } = useAuth();
     const [isLoaderVisible, setLoaderVisible] = useState(false);
@@ -32,9 +32,13 @@ export const ReportPage = () => {
         // Call the api for getAdvisorySettingData and getSensorData
         Promise.all([
             getAdvisorySettingData(user), // Call API to get advisory setting
-            getSensorData(user)  // Call API to get sensor data
+            getSensorData(user),          // Call API to get sensor data
+            getParameters(user)           // Call API to get parameters
         ]).then((reponses) => {
-            let parameters = getParameters();
+            console.log(" ---- ALL DAta Fetching ----")
+            // Organized paramerers
+            let parameters = reponses[2];
+            parameters = getOrganizedParameters(parameters);
             // Organized advisory settings
             let repAdvisorySettings = reponses[0];
             let latestAdvisorySettings = filterLatestAlerts(repAdvisorySettings.value);
