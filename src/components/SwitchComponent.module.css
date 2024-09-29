@@ -32,3 +32,10 @@
 .settings_input fieldset {
   top: -13px;
 }
+.save_btn {
+  font-size: 1em !important;
+  width: 100px;
+}
+.btnDiv {
+  padding-top: 15px;
+}

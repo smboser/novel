@@ -131,3 +131,27 @@ export const getMinMaxAdvisorySettings = (userInfo) => {
   console.log("Constructed URL:", url); // Log the URL
   return url;
 };
+
+export const getValveSettings = (userInfo) => {
+  let url = `https://prod-11.australiaeast.logic.azure.com:443/workflows/1222197568d24a4d90e07180c61d2907/triggers/When_a_HTTP_request_is_received/paths/invoke`;
+  url = `${url}?api-version=${APP_CONST.API_VERSION}`;
+  url = `${url}&sp=${APP_CONST.SP}`;
+  url = `${url}&sv=${APP_CONST.SV}`;
+  url = `${url}&sig=Tba8OM_7F0OvTdtweTCI3c3os1G9WaP0ZVxr9EgrvCI`;
+  url = `${url}&orgName=${userInfo.orgName}`;
+  url = `${url}&authToken=${userInfo.token}`;
+  console.log("Valve Settings URL:", url); // Log the URL
+  return url;
+};
+
+export const setValveSettings = (userInfo) => {
+  let url = `https://prod-13.australiaeast.logic.azure.com:443/workflows/c4db9b21ccab4107aebc33f6adc8c554/triggers/When_a_HTTP_request_is_received/paths/invoke`;
+  url = `${url}?api-version=${APP_CONST.API_VERSION}`;
+  url = `${url}&sp=${APP_CONST.SP}`;
+  url = `${url}&sv=${APP_CONST.SV}`;
+  url = `${url}&sig=X3w4DptdQ1OUPsKeOFd4_9A3OGpQ7Iq6W3jm4IYJJ3E`;
+  url = `${url}&orgName=${userInfo.orgName}`;
+  url = `${url}&authToken=${userInfo.token}`;
+  console.log("Valve Settings URL:", url); // Log the URL
+  return url;
+};
