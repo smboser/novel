@@ -17,6 +17,7 @@ import { toast, Toaster } from "react-hot-toast";
 import { CirclesWithBar } from "react-loader-spinner";
 import SwitchComponent from "../components/SwitchComponent";
 import { APP_CONST } from "../helper/application-constant";
+import { min } from "date-fns";
 
 export const SettingPage = () => {
   const { user } = useAuth();
@@ -83,14 +84,6 @@ export const SettingPage = () => {
           orgName,
         })
       );
-      // settingsData.forEach((s) => {
-      //   s["min"] = minMaxResult.find(
-      //     (mm) => mm.parameter === s.parameter
-      //   )?.min_value;
-      //   s["max"] = minMaxResult.find(
-      //     (mm) => mm.parameter === s.parameter
-      //   )?.max_value;
-      // });
       setSettings(settingsData);
     }
   }, [data, user]);
@@ -322,141 +315,182 @@ export const SettingPage = () => {
                               <input type="hidden" value={setting.parameter} />
                             </td>
                             <td className={styles.settings_input}>
-                              <OutlinedInput
-                                startAdornment={
-                                  <InputAdornment position="start">
-                                    <ErrorOutline style={{ color: "red" }} />
-                                  </InputAdornment>
-                                }
-                                defaultValue={setting.min}
-                                onBlur={(e) =>
-                                  handleBlur(
-                                    setting.parameter,
-                                    "min",
-                                    e.target.value
-                                  )
-                                }
-                                disabled={!setting.active}
-                                error={
-                                  errors[`${setting.parameter}_min`] || false
-                                }
-                                style={{
-                                  borderColor: errors[
-                                    `${setting.parameter}_min`
-                                  ]
-                                    ? "red"
-                                    : "",
-                                  borderWidth: errors[
-                                    `${setting.parameter}_min`
-                                  ]
-                                    ? "2px"
-                                    : "",
-                                }}
-                                aria-describedby="outlined-weight-helper-text"
-                              />
+                              {setting.parameter === "leakage_status" ? (
+                                <div className={styles.switch_container}>
+                                  <span>OFF</span>
+                                  <label className="switch">
+                                    <input
+                                      type="checkbox"
+                                      checked={
+                                        setting.min > 0 && setting.max > 0
+                                      }
+                                      onChange={(e) => {
+                                        setSettings((prev) =>
+                                          prev.map((s) =>
+                                            s.parameter === setting.parameter
+                                              ? {
+                                                  ...s,
+                                                  min: e.target.checked ? 1 : 0,
+                                                  max: e.target.checked ? 1 : 0,
+                                                }
+                                              : s
+                                          )
+                                        );
+                                        setIsEligibleForSave(true);
+                                      }}
+                                    />
+                                    <span className="slider round"></span>
+                                  </label>
+                                  <span>ON</span>
+                                </div>
+                              ) : (
+                                <OutlinedInput
+                                  startAdornment={
+                                    <InputAdornment position="start">
+                                      <ErrorOutline style={{ color: "red" }} />
+                                    </InputAdornment>
+                                  }
+                                  defaultValue={setting.min}
+                                  onBlur={(e) =>
+                                    handleBlur(
+                                      setting.parameter,
+                                      "min",
+                                      e.target.value
+                                    )
+                                  }
+                                  disabled={!setting.active}
+                                  error={
+                                    errors[`${setting.parameter}_min`] || false
+                                  }
+                                  style={{
+                                    borderColor: errors[
+                                      `${setting.parameter}_min`
+                                    ]
+                                      ? "red"
+                                      : "",
+                                    borderWidth: errors[
+                                      `${setting.parameter}_min`
+                                    ]
+                                      ? "2px"
+                                      : "",
+                                  }}
+                                  aria-describedby="outlined-weight-helper-text"
+                                />
+                              )}
                             </td>
                             <td className={styles.settings_input}>
-                              <OutlinedInput
-                                startAdornment={
-                                  <InputAdornment position="start">
-                                    <ErrorOutline style={{ color: "red" }} />
-                                  </InputAdornment>
-                                }
-                                defaultValue={setting.lt}
-                                onBlur={(e) =>
-                                  handleBlur(
-                                    setting.parameter,
-                                    "lt",
-                                    e.target.value
-                                  )
-                                }
-                                disabled={!setting.active}
-                                error={
-                                  errors[`${setting.parameter}_lt`] || false
-                                }
-                                style={{
-                                  borderColor: errors[`${setting.parameter}_lt`]
-                                    ? "red"
-                                    : "",
-                                  borderWidth: errors[`${setting.parameter}_lt`]
-                                    ? "2px"
-                                    : "",
-                                }}
-                                aria-describedby="outlined-weight-helper-text"
-                              />
+                              {setting.parameter !== "leakage_status" ? (
+                                <OutlinedInput
+                                  startAdornment={
+                                    <InputAdornment position="start">
+                                      <ErrorOutline style={{ color: "red" }} />
+                                    </InputAdornment>
+                                  }
+                                  defaultValue={setting.lt}
+                                  onBlur={(e) =>
+                                    handleBlur(
+                                      setting.parameter,
+                                      "lt",
+                                      e.target.value
+                                    )
+                                  }
+                                  disabled={!setting.active}
+                                  error={
+                                    errors[`${setting.parameter}_lt`] || false
+                                  }
+                                  style={{
+                                    borderColor: errors[
+                                      `${setting.parameter}_lt`
+                                    ]
+                                      ? "red"
+                                      : "",
+                                    borderWidth: errors[
+                                      `${setting.parameter}_lt`
+                                    ]
+                                      ? "2px"
+                                      : "",
+                                  }}
+                                  aria-describedby="outlined-weight-helper-text"
+                                />
+                              ) : (
+                                ""
+                              )}
                             </td>
                             <td className={styles.settings_input}>
-                              <OutlinedInput
-                                startAdornment={
-                                  <InputAdornment position="start">
-                                    <ErrorOutline style={{ color: "red" }} />
-                                  </InputAdornment>
-                                }
-                                defaultValue={setting.gt}
-                                onBlur={(e) =>
-                                  handleBlur(
-                                    setting.parameter,
-                                    "gt",
-                                    e.target.value
-                                  )
-                                }
-                                disabled={!setting.active}
-                                error={
-                                  errors[`${setting.parameter}_gt`] || false
-                                }
-                                style={{
-                                  borderColor: errors[`${setting.parameter}_gt`]
-                                    ? "red"
-                                    : "",
-                                  borderWidth: errors[`${setting.parameter}_gt`]
-                                    ? "2px"
-                                    : "",
-                                }}
-                                aria-describedby="outlined-weight-helper-text"
-                              />
+                              {setting.parameter !== "leakage_status" ? (
+                                <OutlinedInput
+                                  startAdornment={
+                                    <InputAdornment position="start">
+                                      <ErrorOutline style={{ color: "red" }} />
+                                    </InputAdornment>
+                                  }
+                                  defaultValue={setting.gt}
+                                  onBlur={(e) =>
+                                    handleBlur(
+                                      setting.parameter,
+                                      "gt",
+                                      e.target.value
+                                    )
+                                  }
+                                  disabled={!setting.active}
+                                  error={
+                                    errors[`${setting.parameter}_gt`] || false
+                                  }
+                                  style={{
+                                    borderColor: errors[
+                                      `${setting.parameter}_gt`
+                                    ]
+                                      ? "red"
+                                      : "",
+                                    borderWidth: errors[
+                                      `${setting.parameter}_gt`
+                                    ]
+                                      ? "2px"
+                                      : "",
+                                  }}
+                                  aria-describedby="outlined-weight-helper-text"
+                                />
+                              ) : (
+                                ""
+                              )}
                             </td>
                             <td className={styles.settings_input}>
-                              <OutlinedInput
-                                startAdornment={
-                                  <InputAdornment position="start">
-                                    <ErrorOutline style={{ color: "red" }} />
-                                  </InputAdornment>
-                                }
-                                defaultValue={setting.max}
-                                // onChange={(e) => {
-                                //   setSettings((prev) =>
-                                //     prev.map((s) =>
-                                //       s.parameter === setting.parameter
-                                //         ? { ...s, max: e.target.value }
-                                //         : s
-                                //     )
-                                //   );
-                                // }}
-                                onBlur={(e) =>
-                                  handleBlur(
-                                    setting.parameter,
-                                    "max",
-                                    e.target.value
-                                  )
-                                }
-                                disabled={!setting.active}
-                                error={
-                                  errors[`${setting.parameter}_max`] || false
-                                }
-                                style={{
-                                  borderColor: errors[
-                                    `${setting.parameter}_max`
-                                  ]
-                                    ? "red"
-                                    : "",
-                                  borderWidth: errors[
-                                    `${setting.parameter}_max`
-                                  ]
-                                    ? "2px"
-                                    : "",
-                                }}
-                                aria-describedby="outlined-weight-helper-text"
-                              />
+                              {setting.parameter !== "leakage_status" ? (
+                                <OutlinedInput
+                                  startAdornment={
+                                    <InputAdornment position="start">
+                                      <ErrorOutline style={{ color: "red" }} />
+                                    </InputAdornment>
+                                  }
+                                  defaultValue={setting.max}
+                                  onBlur={(e) =>
+                                    handleBlur(
+                                      setting.parameter,
+                                      "max",
+                                      e.target.value
+                                    )
+                                  }
+                                  disabled={!setting.active}
+                                  error={
+                                    errors[`${setting.parameter}_max`] || false
+                                  }
+                                  style={{
+                                    borderColor: errors[
+                                      `${setting.parameter}_max`
+                                    ]
+                                      ? "red"
+                                      : "",
+                                    borderWidth: errors[
+                                      `${setting.parameter}_max`
+                                    ]
+                                      ? "2px"
+                                      : "",
+                                  }}
+                                  aria-describedby="outlined-weight-helper-text"
+                                />
+                              ) : (
+                                ""
+                              )}
                             </td>
                           </tr>
                         ))}

@@ -49,3 +49,13 @@
 .settings_input fieldset {
   top: -13px;
 }
+.switch_container {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Add this if you want some spacing between ON, OFF, and the switch */
+  padding: 0;
+}
+
+.switch_container span {
+  padding: 0 10px;
+}
