@@ -110,11 +110,11 @@ export const getParameters = (userInfo) => {
 
 // src/helper/web-service.js
 export const getAdvisorySettings = (userInfo) => {
-  let url = `https://prod-07.australiaeast.logic.azure.com:443/workflows/86ea5a4f3b8543f39308cba0e6a34afd/triggers/When_a_HTTP_request_is_received/paths/invoke`;
+  let url = `https://prod-30.australiaeast.logic.azure.com:443/workflows/f9721efd19cd43d88b6c210f7e6d6285/triggers/When_a_HTTP_request_is_received/paths/invoke`;
   url = `${url}?api-version=${APP_CONST.API_VERSION}`;
   url = `${url}&sp=${APP_CONST.SP}`;
   url = `${url}&sv=${APP_CONST.SV}`;
-  url = `${url}&sig=wGSuCPj2oqpTrxzWsiD5R1zHKemHaNkDt4JsXIRmWUM`;
+  url = `${url}&sig=zIC4PONUSiOh6jeutZWHmcRqiNXOzpeB_GthG2fZhjY`;
   url = `${url}&orgName=${userInfo.orgName}`;
   url = `${url}&authToken=${userInfo.token}`;
   console.log("Constructed URL:", url); // Log the URL
@@ -122,11 +122,11 @@ export const getAdvisorySettings = (userInfo) => {
 };
 
 export const setAdvisorySettings = (userInfo) => {
-  let url = `https://prod-26.australiaeast.logic.azure.com:443/workflows/3c179ff0e6064518b5750820cac3e7a8/triggers/When_a_HTTP_request_is_received/paths/invoke`;
+  let url = `https://prod-19.australiaeast.logic.azure.com:443/workflows/fae611fcbcdc4cd69a01623fda100949/triggers/When_a_HTTP_request_is_received/paths/invoke`;
   url = `${url}?api-version=${APP_CONST.API_VERSION}`;
   url = `${url}&sp=${APP_CONST.SP}`;
   url = `${url}&sv=${APP_CONST.SV}`;
-  url = `${url}&sig=ZjmaeAOmkBUJb0a5KEXPL4n7bCp9W_doTwMsvTK987c`;
+  url = `${url}&sig=8g_Xyrx6xGhAfN8tSF3Sr6dLkpR9oqJ9a2tJXcc-CHg`;
   url = `${url}&orgName=${userInfo.orgName}`;
   url = `${url}&authToken=${userInfo.token}`;
   console.log("Constructed URL:", url); // Log the URL
