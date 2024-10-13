@@ -6,9 +6,9 @@ import { InputAdornment, OutlinedInput, Button } from "@mui/material";
 import { ErrorOutline } from "@mui/icons-material";
 import { useQuery } from "react-query";
 import axios from "axios";
-import { filterLatestAlerts } from "../helper/utils";
 import {
   setAdvisorySettings,
+  getDevices,
   getAdvisorySettings
 } from "../helper/web-service";
 import styles from "./SettingPage.module.css";
@@ -16,8 +16,6 @@ import { toast, Toaster } from "react-hot-toast";
 import { CirclesWithBar } from "react-loader-spinner";
 import SwitchComponent from "../components/SwitchComponent";
 import { APP_CONST } from "../helper/application-constant";
-import { min } from "date-fns";
-
 export const SettingPage = () => {
   const { user } = useAuth();
   const [settings, setSettings] = useState([]);
@@ -33,9 +31,10 @@ export const SettingPage = () => {
   const orgName = user.orgName;
   // Fetch data inside the component
   const fetchAlertData = async () => {
-    const apiUrl = getAdvisorySettings(user);
-    const response = await axios.get(apiUrl);
-    return response.data.value;
+    const responses = await Promise.all([getDevices(user), getAdvisorySettings(user)]);
+    const devices = responses[0]["value"];
+    const advisorySettings = responses[1]["value"];
+    return { devices, advisorySettings };
   };
 
   const { data, isLoading, error } = useQuery("alertData", fetchAlertData);
@@ -43,8 +42,18 @@ export const SettingPage = () => {
   // Update state when data is fetched
   useEffect(() => {
     if (data) {
+      // Getting device list 
+      const deviceList = data.devices.reduce((acc, device) => {
+        if (!acc[device.devEUI]) {
+          acc[device.devEUI] = null;
+        }
+        acc[device.devEUI] = device.devName;
+        return acc;
+      }, {});
+
+      // Getting organized the data
       const organizedData = {};
-      data.forEach((dt) => {
+      data.advisorySettings.forEach((dt) => {
         let devEUI = dt.devEUI;
         if (!organizedData[devEUI]) {
           organizedData[devEUI] = [];
@@ -62,15 +71,20 @@ export const SettingPage = () => {
           repeatedAlert: dt.repeatedAlert
         })
       });
+
+      // Getting settings the data
       const settingsData = Object.entries(organizedData).map(
         ([
           devEUI,
           parameters,
-        ]) => ({
-          devEUI,
-          parameters
-        })
-      );
+        ]) => {
+          let devName = deviceList[devEUI];
+          return {
+            devName,
+            devEUI,
+            parameters
+          }
+        });
       setSettings(settingsData);
     }
   }, [data, user]);
@@ -131,7 +145,7 @@ export const SettingPage = () => {
     try {
       let selectedDevice = settings.find((s) => s?.devEUI === devEUI);
       let selectedSetting = selectedDevice.parameters.find((s) => s?.parameter === parameter);
-      selectedSetting = {...selectedSetting, devEUI: devEUI};
+      selectedSetting = { ...selectedSetting, devEUI: devEUI };
       console.log("selectedSetting :", selectedSetting);
       if (selectedSetting.length === 0) {
         toast.warn("No settings to save.");
@@ -235,8 +249,8 @@ export const SettingPage = () => {
                 <div>
                   {settings.map((setting, index) => (
                     <div key={index}>
-                      <h5>{setting.devEUI}</h5>
-                      <div className="chartbox dbb">
+                      <h5><b>{setting.devName} :</b> {setting.devEUI}</h5>
+                      <div className="chartbox dbb" style={{"marginTop":"10px"}}>
                         <table
                           id="datatable"
                           className={`table table-striped table-bordered ${styles.table}`}

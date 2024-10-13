@@ -4,13 +4,13 @@ import { calculateAvgLatestData } from "../helper/utils";
 import { useAuth } from "../hooks/useAuth";
 import { APP_CONST } from "../helper/application-constant";
 export const GaugeChart = ({ setting, selectedDevices, last24HoursData }) => {
-  let { min_value, max_value, lt, gt, parameter } = setting;
+  let { min_value, max_value, currentMinAlert, currentMaxAlert, parameter } = setting;
   // Calculate low thohresld and high thohresld
   let low_thohresld = Math.floor(
-    lt ? (lt < min_value ? min_value : lt) : min_value
+    currentMinAlert ? (currentMinAlert < min_value ? min_value : currentMinAlert) : min_value
   );
   let high_thohresld = Math.floor(
-    gt ? (gt > max_value ? max_value * 0.7 : gt) : max_value * 0.7
+    currentMaxAlert ? (currentMaxAlert > max_value ? max_value * 0.7 : currentMaxAlert) : max_value * 0.7
   );
   // Calculate average
   let avg = calculateAvgLatestData(last24HoursData, parameter, selectedDevices);
@@ -81,7 +81,7 @@ export const GaugeChart = ({ setting, selectedDevices, last24HoursData }) => {
           maxValue={max_value}
         />
         <div className="info">
-          <h5>{setting.name}</h5>
+          <h5>{setting.paramDisplayName}</h5>
         </div>
       </div>
 

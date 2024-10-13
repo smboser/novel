@@ -89,26 +89,37 @@ export const getOrganizedParameters = (data) => {
 }
 
 
-export const getOrganizedAdvisorySettings = (data, parameters) => {
+export const getOrganizedAdvisorySettings = (data) => {
   const advisorySettings = data.reduce((acc, alert) => {
-    if (parameters[alert.parameter]) {
-      if (!acc[alert.parameter] && alert.active) {
-          let param = parameters[alert.parameter];
-          let curObj = {
-              lt: "",
-              gt: "",
-              active: alert.active,
-              parameter: alert.parameter,
-              orgName: alert.orgName,
-              min_value: alert.min,
-              max_value: alert.max
-          };
-          acc[alert.parameter] = { ...param, ...curObj };
+    if (alert.alertActive && alert.parameter != "leakage_status") {
+      let parameter = alert.parameter;
+      if (!acc[parameter]) {
+        acc[parameter] = {
+          parameter: parameter,
+          paramDisplayName: alert.paramDisplayName,
+          orgName: alert.orgName,
+          currentMinAlert: alert.currentMinAlert,
+          min_value: alert.min_value,
+          currentMaxAlert: alert.currentMaxAlert,
+          max_value: alert.max_value,
+          unit: alert.unit,
+          active: alert.alertActive
+        };
       }
-      if (alert.func === "lt" && alert.active) {
-        acc[alert.parameter].lt = alert.level || "";
-      } else if (alert.func === "gt" && alert.active) {
-        acc[alert.parameter].gt = alert.level || "";
+      if (acc[parameter]["min_value"] > alert.min_value) {
+        acc[parameter]["min_value"] = alert.min_value;
+      }
+
+      if (acc[parameter]["currentMaxAlert"] > alert.currentMaxAlert) {
+        acc[parameter]["currentMaxAlert"] = alert.currentMaxAlert;
+      }
+
+      if (acc[parameter]["max_value"] < alert.max_value) {
+        acc[parameter]["max_value"] = alert.max_value;
+      }
+
+      if (acc[parameter]["currentMaxAlert"] < alert.currentMaxAlert) {
+        acc[parameter]["currentMaxAlert"] = alert.currentMaxAlert;
       }
     }
     return acc;

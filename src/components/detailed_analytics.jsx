@@ -61,6 +61,11 @@ export const DetailedAnalytics = ({ settings, devices, selectedDevices, series, 
     };
 
     useEffect(() => {
+        console.log(`Inside organized serie data`);
+        console.log(organizedSerieData);
+    }, [organizedSerieData]);
+
+    useEffect(() => {
         console.log(`Inside useEffect for  DetailedAnalytics`);
         detailedAnalyticsData();
     }, []);
@@ -105,7 +110,7 @@ export const DetailedAnalytics = ({ settings, devices, selectedDevices, series, 
                         {Object.keys(settings).map((setname, i) => {
                             let setting = settings[setname];
                             return (
-                                <option key={i} value={setting.parameter}>{setting.name}</option>
+                                <option key={i} value={setting.parameter}>{setting.paramDisplayName}</option>
                             )
                         })}
                     </select>

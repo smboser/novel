@@ -4,7 +4,7 @@ import { CirclesWithBar } from "react-loader-spinner";
 import "react-multi-carousel/lib/styles.css";
 import { useAuth } from "../hooks/useAuth";
 import { APP_CONST } from "../helper/application-constant";
-import { getSensorData, getAdvisorySettingData, getParameters } from "../helper/web-service";
+import { getSensorData, getAdvisorySettings } from "../helper/web-service";
 import { Navbar } from "../components/nav";
 import { Footer } from "../components/footer";
 import { AvgParameters } from "../components/avg_parameters";
@@ -31,27 +31,23 @@ export const ReportPage = () => {
 
         // Call the api for getAdvisorySettingData and getSensorData
         Promise.all([
-            getAdvisorySettingData(user), // Call API to get advisory setting
-            getSensorData(user),          // Call API to get sensor data
-            getParameters(user)           // Call API to get parameters
+            getAdvisorySettings(user),  // Call API to get advisory setting
+            getSensorData(user)         // Call API to get sensor data
         ]).then((reponses) => {
             console.log(" ---- ALL DAta Fetching ----")
-            // Organized paramerers
-            let parameters = reponses[2];
-            parameters = getOrganizedParameters(parameters);
             // Organized advisory settings
-            let repAdvisorySettings = reponses[0];
-            let latestAdvisorySettings = filterLatestAlerts(repAdvisorySettings.value);
-            let organizedAdvisorySettings = getOrganizedAdvisorySettings(latestAdvisorySettings, parameters);
+            let repAdvisorySettings = reponses[0]["value"];
+            let organizedAdvisorySettings = getOrganizedAdvisorySettings(repAdvisorySettings);
             console.log("Organized Advisory Settings:", organizedAdvisorySettings);
 
             // Organized sensor data
-            let repSensorData = reponses[1];
+            let repSensorData = reponses[1]["value"];
             let activeAdvisorySettings = Object.keys(organizedAdvisorySettings);
+            debugger;
             let seriesData = {};
             let latestData = {};
             let deviceList = new Set();
-            repSensorData.value.forEach(value => {
+            repSensorData.forEach(value => {
                 let devName = value.devName;
                 let instData = { "timestamp": value.Timestamp };
                 activeAdvisorySettings.forEach((setname) => {

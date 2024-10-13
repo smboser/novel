@@ -1,4 +1,5 @@
 import { APP_CONST } from "./application-constant";
+import moment  from "moment";
 
 const requestHeader = {
   Accept: "application/json",
@@ -77,6 +78,8 @@ export const getSensorData = (userInfo) => {
   url = `${url}&sig=wRTuMv158QzmYIxy3B-fc9lvAb8S83QTbnwR-PZQL14`;
   url = `${url}&orgName=${userInfo.orgName}`;
   url = `${url}&authToken=${userInfo.token}`;
+  url = `${url}&dateStart=${moment().subtract(7, "days").format('YYYY-MM-DD')}`;
+  url = `${url}&dateEnd=${moment().format('YYYY-MM-DD')}`;
   // Call end point
   return getRequest(url);
 };
@@ -110,6 +113,7 @@ export const getParameters = (userInfo) => {
 
 // src/helper/web-service.js
 export const getAdvisorySettings = (userInfo) => {
+  // For URL
   let url = `https://prod-30.australiaeast.logic.azure.com:443/workflows/f9721efd19cd43d88b6c210f7e6d6285/triggers/When_a_HTTP_request_is_received/paths/invoke`;
   url = `${url}?api-version=${APP_CONST.API_VERSION}`;
   url = `${url}&sp=${APP_CONST.SP}`;
@@ -118,7 +122,8 @@ export const getAdvisorySettings = (userInfo) => {
   url = `${url}&orgName=${userInfo.orgName}`;
   url = `${url}&authToken=${userInfo.token}`;
   console.log("Constructed URL:", url); // Log the URL
-  return url;
+  // Call end point
+  return getRequest(url);
 };
 
 export const setAdvisorySettings = (userInfo) => {
