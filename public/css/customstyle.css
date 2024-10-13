@@ -20,7 +20,7 @@ body {
     /* height: 500px; */
     padding-right: 0px !important;
     padding-left: 0px;
-    width: 99%; */
+    width: 99%;
   }
   .mobileview {
     display: none;
@@ -177,9 +177,9 @@ body {
 .navbar-header .navbar-brand,
 .navbar-nav > li > a,
 .site_title {
-    color: #000 !important;
-    margin-left: 0 !important;
-    font-weight: bold;
+  color: #000 !important;
+  margin-left: 0 !important;
+  font-weight: bold;
 }
 
 .ttl_main h2 {

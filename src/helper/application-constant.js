@@ -4,7 +4,7 @@ export const APP_CONST = {
   SP: "/triggers/When_a_HTTP_request_is_received/run",
   SV: "1.0",
   default_parameter: "temperature",
-  farmer_companies: ["JoeFarm"],
+  farmer_companies: ["JoeFarm","FieldSolutions"],
   parameters: [
     {
       name: "Temperature",

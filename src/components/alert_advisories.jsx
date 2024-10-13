@@ -28,18 +28,18 @@ export const AlertAdvisories = ({ settings, last24HoursData }) => {
     let devices = Object.keys(last24HoursData);
     Object.keys(settings).forEach((setname) => {
         let setting = settings[setname];
-        let { name, unit, lt, gt, parameter } = setting;
+        let { paramDisplayName, unit, currentMinAlert, currentMaxAlert, parameter } = setting;
 
 
         devices.forEach((device) => {
             let data = last24HoursData[device];
             let curval = data[parameter];
             // For exceeded
-            if (typeof (gt) != "undefined" && gt && curval > gt) {
+            if (typeof (currentMaxAlert) != "undefined" && currentMaxAlert && curval > currentMaxAlert) {
                 let altdata = {
                     "devName": device,
                     "parameter": parameter,
-                    "name": name,
+                    "name": paramDisplayName,
                     "unit": unit,
                     "value": curval,
                     "msg": `${device} has exceeded ${parameter}`
@@ -48,11 +48,11 @@ export const AlertAdvisories = ({ settings, last24HoursData }) => {
             }
 
             // For subceeded
-            if (typeof (lt) != "undefined" && lt && curval < lt) {
+            if (typeof (currentMinAlert) != "undefined" && currentMinAlert && curval < currentMinAlert) {
                 let altdata = {
                     "devName": device,
                     "parameter": parameter,
-                    "name": name,
+                    "name": paramDisplayName,
                     "unit": unit,
                     "value": curval,
                     "msg": `${device} has subceeded ${parameter}`
