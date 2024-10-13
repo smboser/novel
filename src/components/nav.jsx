@@ -35,7 +35,7 @@ export const Navbar = () => {
             <img
               src="https://anixsoft.co.in/wp-content/uploads/2017/08/logo-icon.png"
               className="orglog"
-              style={{ height: "40px", width: "80px" }}
+              style={{ width: "38%" }}
             />
           </a>
         </div>
