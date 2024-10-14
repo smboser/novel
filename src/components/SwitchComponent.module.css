@@ -1,3 +1,7 @@
+.deviceTable {
+  overflow-x: auto;
+  white-space: nowrap;
+}
 .deviceTable td div {
   font-size: 13px;
 }
@@ -8,12 +12,17 @@
 .timPicker li {
   font-size: 12px;
 }
+.table {
+  width: 100%;
+}
 .table th,
 .table td,
 .table tr {
   vertical-align: middle !important;
   padding: 5px !important;
   text-align: center;
+  white-space: nowrap;
+  min-width: 80px;
 }
 
 .table td span {
@@ -38,4 +47,29 @@
 }
 .btnDiv {
   padding-top: 15px;
+}
+.table th.stickyColumn1,
+.table td.stickyColumn1 {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background-color: white;
+  min-width: 60px;
+}
+
+.table th.stickyColumn2,
+.table td.stickyColumn2 {
+  position: sticky;
+  left: 60px;
+  z-index: 2;
+  background-color: white;
+  min-width: 80px;
+}
+
+.table td.stickyColumn1 {
+  z-index: 1;
+}
+
+.table td.stickyColumn2 {
+  z-index: 1;
 }
