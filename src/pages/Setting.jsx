@@ -228,315 +228,286 @@ export const SettingPage = () => {
           <div className="col-md-12 col-sm-12 col-xs-12">
             <Navbar />
           </div>
-          <div className="col-md-12 col-sm-12 col-xs-12"></div>
-          <div className="">
-            <div className="col-md-12 col-sm-12 col-xs-12 report" id="style-3">
-              <div className="x_panel">
+          <div className="col-md-12 col-sm-12 col-xs-12 report" id="style-3">
+            <div className="x_panel">
+              <div className="col-md-12 col-sm-12 col-xs-12">
+                <div className="ttl_main">
+                  <h2>
+                    <strong>Advisory Setting</strong>
+                  </h2>
+                </div>
+              </div>
+              <div className="row">
                 <div className="col-md-12 col-sm-12 col-xs-12">
-                  <div className="ttl_main">
-                    <h2>
-                      <strong>Advisory Setting</strong>
-                    </h2>
-                  </div>
-                </div>
-                <div className="row">
-                  <div className="col-md-12 col-sm-12 col-xs-12">
-                    <div className="centerwrapperbox">
-                      <h2 className="dev_ttlmain"> </h2>
-                    </div>
-                  </div>
-                </div>
-                <div>
-                  {settings.map((setting, index) => (
-                    <div key={index}>
-                      <h5><b>{setting.devName} :</b> {setting.devEUI}</h5>
-                      <div className="chartbox dbb" style={{"marginTop":"10px"}}>
-                        <table
-                          id="datatable"
-                          className={`table table-striped table-bordered ${styles.table}`}
-                        >
-                          <thead>
-                            <tr>
-                              <th style={{ textAlign: "center" }}>Active</th>
-                              <th style={{ textAlign: "center" }}>Alert</th>
-                              <th style={{ textAlign: "center" }}>Minimum</th>
-                              <th style={{ textAlign: "center" }}>Low Threshold</th>
-                              <th style={{ textAlign: "center" }}>
-                                High Threshold
-                              </th>
-                              <th style={{ textAlign: "center" }}>Maximum</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {setting.parameters.map((param, index) => (
-                              <tr key={index}>
-                                <td>
-                                  <label className="switch">
-                                    <input
-                                      type="checkbox"
-                                      checked={param.alertActive}
-                                      onChange={(e) => {
-                                        setSettings((prev) => {
-                                          prev.map((s) => {
-                                            if (s.devEUI === setting.devEUI) {
-                                              s.parameters.map((p) => {
-                                                if (p.parameter === param.parameter) {
-                                                  p.alertActive = e.target.checked;
-                                                }
-                                                return p;
-                                              })
-                                            }
-                                            return s;
-                                          })
-                                          return prev;
-                                        });
-                                        setIsEligibleDevEUIForSave(setting.devEUI);
-                                        setIsEligibleParameterForSave(param.parameter);
-                                        setIsEligibleForSave(true);
-                                      }}
-                                    />
-                                    <span className="slider round"></span>
-                                  </label>
-                                </td>
-                                <td>
-                                  <span>{param.paramDisplayName}</span>
-                                  <input type="hidden" value={param.parameter} />
-                                </td>
-                                <td className={styles.settings_input}>
-                                  {param.parameter === "leakage_status" ? (
-                                    <div className={styles.switch_container}>
-                                      <span>OFF</span>
-                                      <label className="switch">
-                                        <input
-                                          type="checkbox"
-                                          checked={
-                                            param.min_value > 0 && param.max_value > 0
-                                          }
-                                          onChange={(e) => {
-                                            setSettings((prev) => {
-                                              prev.map((s) => {
-                                                if (s.devEUI === setting.devEUI) {
-                                                  s.parameters.map((p) => {
-                                                    if (p.parameter === param.parameter) {
-                                                      p.min_value = e.target.checked ? 1 : 0;
-                                                      p.max_value = e.target.checked ? 1 : 0;
-                                                    }
-                                                    return p;
-                                                  })
-                                                }
-                                                return s;
-                                              })
-                                              return prev;
-                                            });
-                                            setIsEligibleDevEUIForSave(setting.devEUI);
-                                            setIsEligibleParameterForSave(param.parameter);
-                                            setIsEligibleForSave(true);
-                                          }}
-                                        />
-                                        <span className="slider round"></span>
-                                      </label>
-                                      <span>ON</span>
-                                    </div>
-                                  ) : (
-                                    <OutlinedInput
-                                      startAdornment={
-                                        <InputAdornment position="start">
-                                          <ErrorOutline style={{ color: "red" }} />
-                                        </InputAdornment>
-                                      }
-                                      defaultValue={param.min_value}
-                                      onBlur={(e) =>
-                                        handleBlur(
-                                          setting.devEUI,
-                                          param.parameter,
-                                          "min_value",
-                                          e.target.value
-                                        )
-                                      }
-                                      disabled={!param.alertActive}
-                                      error={
-                                        errors[`${param.parameter}_min_value`] || false
-                                      }
-                                      style={{
-                                        borderColor: errors[
-                                          `${param.parameter}_min_value`
-                                        ]
-                                          ? "red"
-                                          : "",
-                                        borderWidth: errors[
-                                          `${param.parameter}_min_value`
-                                        ]
-                                          ? "2px"
-                                          : "",
-                                      }}
-                                      aria-describedby="outlined-weight-helper-text"
-                                    />
-                                  )}
-                                </td>
-                                <td className={styles.settings_input}>
-                                  {param.parameter !== "leakage_status" ? (
-                                    <OutlinedInput
-                                      startAdornment={
-                                        <InputAdornment position="start">
-                                          <ErrorOutline style={{ color: "red" }} />
-                                        </InputAdornment>
-                                      }
-                                      defaultValue={param.currentMinAlert}
-                                      onBlur={(e) =>
-                                        handleBlur(
-                                          setting.devEUI,
-                                          param.parameter,
-                                          "currentMinAlert",
-                                          e.target.value
-                                        )
-                                      }
-                                      disabled={!param.alertActive}
-                                      error={
-                                        errors[`${param.parameter}_currentMinAlert`] || false
-                                      }
-                                      style={{
-                                        borderColor: errors[
-                                          `${param.parameter}_currentMinAlert`
-                                        ]
-                                          ? "red"
-                                          : "",
-                                        borderWidth: errors[
-                                          `${param.parameter}_currentMinAlert`
-                                        ]
-                                          ? "2px"
-                                          : "",
-                                      }}
-                                      aria-describedby="outlined-weight-helper-text"
-                                    />
-                                  ) : (
-                                    ""
-                                  )}
-                                </td>
-                                <td className={styles.settings_input}>
-                                  {param.parameter !== "leakage_status" ? (
-                                    <OutlinedInput
-                                      startAdornment={
-                                        <InputAdornment position="start">
-                                          <ErrorOutline style={{ color: "red" }} />
-                                        </InputAdornment>
-                                      }
-                                      defaultValue={param.currentMaxAlert}
-                                      onBlur={(e) =>
-                                        handleBlur(
-                                          setting.devEUI,
-                                          param.parameter,
-                                          "currentMaxAlert",
-                                          e.target.value
-                                        )
-                                      }
-                                      disabled={!param.alertActive}
-                                      error={
-                                        errors[`${param.parameter}_currentMaxAlert`] || false
-                                      }
-                                      style={{
-                                        borderColor: errors[
-                                          `${param.parameter}_currentMaxAlert`
-                                        ]
-                                          ? "red"
-                                          : "",
-                                        borderWidth: errors[
-                                          `${param.parameter}_currentMaxAlert`
-                                        ]
-                                          ? "2px"
-                                          : "",
-                                      }}
-                                      aria-describedby="outlined-weight-helper-text"
-                                    />
-                                  ) : (
-                                    ""
-                                  )}
-                                </td>
-                                <td className={styles.settings_input}>
-                                  {param.parameter !== "leakage_status" ? (
-                                    <OutlinedInput
-                                      startAdornment={
-                                        <InputAdornment position="start">
-                                          <ErrorOutline style={{ color: "red" }} />
-                                        </InputAdornment>
-                                      }
-                                      defaultValue={param.max_value}
-                                      onBlur={(e) =>
-                                        handleBlur(
-                                          setting.devEUI,
-                                          param.parameter,
-                                          "max_value",
-                                          e.target.value
-                                        )
-                                      }
-                                      disabled={!param.alertActive}
-                                      error={
-                                        errors[`${param.parameter}_max_value`] || false
-                                      }
-                                      style={{
-                                        borderColor: errors[
-                                          `${param.parameter}_max_value`
-                                        ]
-                                          ? "red"
-                                          : "",
-                                        borderWidth: errors[
-                                          `${param.parameter}_max_value`
-                                        ]
-                                          ? "2px"
-                                          : "",
-                                      }}
-                                      aria-describedby="outlined-weight-helper-text"
-                                    />
-                                  ) : (
-                                    ""
-                                  )}
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  ))}
-
-
-                  <div className="row">
-                    <div className="col-md-12 col-sm-12 col-xs-12">
-                      <div
-                        className="dev_ttlmain"
-                        style={{ paddingTop: "5px" }}
-                      >
-                        Should autosave as well on change...
-                        {showSuccMsg ? (
-                          <span className={styles.succ_msg}>
-                            Settings saved successfully
-                          </span>
-                        ) : (
-                          ""
-                        )}
-                        {showErrMsg ? (
-                          <span className={styles.err_msg}>
-                            Error saving settings. Please try again.
-                          </span>
-                        ) : (
-                          ""
-                        )}
-                      </div>
-                    </div>
+                  <div className="centerwrapperbox">
+                    <h2 className="dev_ttlmain"> </h2>
                   </div>
                 </div>
               </div>
+              <div>
+                {settings.map((setting, index) => (
+                  <div key={index}>
+                    <h5><b>{setting.devName} :</b> {setting.devEUI}</h5>
+                    <div className="chartbox dbb" style={{ "marginTop": "10px" }}>
+                      <table
+                        id="datatable"
+                        className={`table table-striped table-bordered ${styles.table}`}
+                      >
+                        <thead>
+                          <tr>
+                            <th style={{ textAlign: "center" }}>Active</th>
+                            <th style={{ textAlign: "center" }}>Alert</th>
+                            <th style={{ textAlign: "center" }}>Minimum</th>
+                            <th style={{ textAlign: "center" }}>Low Threshold</th>
+                            <th style={{ textAlign: "center" }}>
+                              High Threshold
+                            </th>
+                            <th style={{ textAlign: "center" }}>Maximum</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {setting.parameters.map((param, index) => (
+                            <tr key={index}>
+                              <td>
+                                <label className="switch">
+                                  <input
+                                    type="checkbox"
+                                    checked={param.alertActive}
+                                    onChange={(e) => {
+                                      setSettings((prev) => {
+                                        prev.map((s) => {
+                                          if (s.devEUI === setting.devEUI) {
+                                            s.parameters.map((p) => {
+                                              if (p.parameter === param.parameter) {
+                                                p.alertActive = e.target.checked;
+                                              }
+                                              return p;
+                                            })
+                                          }
+                                          return s;
+                                        })
+                                        return prev;
+                                      });
+                                      setIsEligibleDevEUIForSave(setting.devEUI);
+                                      setIsEligibleParameterForSave(param.parameter);
+                                      setIsEligibleForSave(true);
+                                    }}
+                                  />
+                                  <span className="slider round"></span>
+                                </label>
+                              </td>
+                              <td>
+                                <span>{param.paramDisplayName}</span>
+                                <input type="hidden" value={param.parameter} />
+                              </td>
+                              <td className={styles.settings_input}>
+                                {param.parameter === "leakage_status" ? (
+                                  <div className={styles.switch_container}>
+                                    <span>OFF</span>
+                                    <label className="switch">
+                                      <input
+                                        type="checkbox"
+                                        checked={
+                                          param.min_value > 0 && param.max_value > 0
+                                        }
+                                        onChange={(e) => {
+                                          setSettings((prev) => {
+                                            prev.map((s) => {
+                                              if (s.devEUI === setting.devEUI) {
+                                                s.parameters.map((p) => {
+                                                  if (p.parameter === param.parameter) {
+                                                    p.min_value = e.target.checked ? 1 : 0;
+                                                    p.max_value = e.target.checked ? 1 : 0;
+                                                  }
+                                                  return p;
+                                                })
+                                              }
+                                              return s;
+                                            })
+                                            return prev;
+                                          });
+                                          setIsEligibleDevEUIForSave(setting.devEUI);
+                                          setIsEligibleParameterForSave(param.parameter);
+                                          setIsEligibleForSave(true);
+                                        }}
+                                      />
+                                      <span className="slider round"></span>
+                                    </label>
+                                    <span>ON</span>
+                                  </div>
+                                ) : (
+                                  <OutlinedInput
+                                    startAdornment={
+                                      <InputAdornment position="start">
+                                        <ErrorOutline style={{ color: "red" }} />
+                                      </InputAdornment>
+                                    }
+                                    defaultValue={param.min_value}
+                                    onBlur={(e) =>
+                                      handleBlur(
+                                        setting.devEUI,
+                                        param.parameter,
+                                        "min_value",
+                                        e.target.value
+                                      )
+                                    }
+                                    disabled={!param.alertActive}
+                                    error={
+                                      errors[`${param.parameter}_min_value`] || false
+                                    }
+                                    style={{
+                                      borderColor: errors[
+                                        `${param.parameter}_min_value`
+                                      ]
+                                        ? "red"
+                                        : "",
+                                      borderWidth: errors[
+                                        `${param.parameter}_min_value`
+                                      ]
+                                        ? "2px"
+                                        : "",
+                                    }}
+                                    aria-describedby="outlined-weight-helper-text"
+                                  />
+                                )}
+                              </td>
+                              <td className={styles.settings_input}>
+                                {param.parameter !== "leakage_status" ? (
+                                  <OutlinedInput
+                                    startAdornment={
+                                      <InputAdornment position="start">
+                                        <ErrorOutline style={{ color: "red" }} />
+                                      </InputAdornment>
+                                    }
+                                    defaultValue={param.currentMinAlert}
+                                    onBlur={(e) =>
+                                      handleBlur(
+                                        setting.devEUI,
+                                        param.parameter,
+                                        "currentMinAlert",
+                                        e.target.value
+                                      )
+                                    }
+                                    disabled={!param.alertActive}
+                                    error={
+                                      errors[`${param.parameter}_currentMinAlert`] || false
+                                    }
+                                    style={{
+                                      borderColor: errors[
+                                        `${param.parameter}_currentMinAlert`
+                                      ]
+                                        ? "red"
+                                        : "",
+                                      borderWidth: errors[
+                                        `${param.parameter}_currentMinAlert`
+                                      ]
+                                        ? "2px"
+                                        : "",
+                                    }}
+                                    aria-describedby="outlined-weight-helper-text"
+                                  />
+                                ) : (
+                                  ""
+                                )}
+                              </td>
+                              <td className={styles.settings_input}>
+                                {param.parameter !== "leakage_status" ? (
+                                  <OutlinedInput
+                                    startAdornment={
+                                      <InputAdornment position="start">
+                                        <ErrorOutline style={{ color: "red" }} />
+                                      </InputAdornment>
+                                    }
+                                    defaultValue={param.currentMaxAlert}
+                                    onBlur={(e) =>
+                                      handleBlur(
+                                        setting.devEUI,
+                                        param.parameter,
+                                        "currentMaxAlert",
+                                        e.target.value
+                                      )
+                                    }
+                                    disabled={!param.alertActive}
+                                    error={
+                                      errors[`${param.parameter}_currentMaxAlert`] || false
+                                    }
+                                    style={{
+                                      borderColor: errors[
+                                        `${param.parameter}_currentMaxAlert`
+                                      ]
+                                        ? "red"
+                                        : "",
+                                      borderWidth: errors[
+                                        `${param.parameter}_currentMaxAlert`
+                                      ]
+                                        ? "2px"
+                                        : "",
+                                    }}
+                                    aria-describedby="outlined-weight-helper-text"
+                                  />
+                                ) : (
+                                  ""
+                                )}
+                              </td>
+                              <td className={styles.settings_input}>
+                                {param.parameter !== "leakage_status" ? (
+                                  <OutlinedInput
+                                    startAdornment={
+                                      <InputAdornment position="start">
+                                        <ErrorOutline style={{ color: "red" }} />
+                                      </InputAdornment>
+                                    }
+                                    defaultValue={param.max_value}
+                                    onBlur={(e) =>
+                                      handleBlur(
+                                        setting.devEUI,
+                                        param.parameter,
+                                        "max_value",
+                                        e.target.value
+                                      )
+                                    }
+                                    disabled={!param.alertActive}
+                                    error={
+                                      errors[`${param.parameter}_max_value`] || false
+                                    }
+                                    style={{
+                                      borderColor: errors[
+                                        `${param.parameter}_max_value`
+                                      ]
+                                        ? "red"
+                                        : "",
+                                      borderWidth: errors[
+                                        `${param.parameter}_max_value`
+                                      ]
+                                        ? "2px"
+                                        : "",
+                                    }}
+                                    aria-describedby="outlined-weight-helper-text"
+                                  />
+                                ) : (
+                                  ""
+                                )}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
-
-        {farmer_companies.includes(orgName) ? (
           <div className="col-md-12 col-sm-12 col-xs-12">
-            <SwitchComponent />
+            {farmer_companies.includes(orgName) ? (
+              <div className="col-md-12 col-sm-12 col-xs-12">
+                <SwitchComponent />
+              </div>
+            ) : (
+              ""
+            )}
           </div>
-        ) : (
-          ""
-        )}
-
+        </div>
       </div>
       <Footer />
     </>
