@@ -9,7 +9,7 @@ import axios from "axios";
 import {
   setAdvisorySettings,
   getDevices,
-  getAdvisorySettings
+  getAdvisorySettings,
 } from "../helper/web-service";
 import styles from "./SettingPage.module.css";
 import { toast, Toaster } from "react-hot-toast";
@@ -24,14 +24,18 @@ export const SettingPage = () => {
   const [showErrMsg, setShowErrMsg] = useState(false);
   const [isEligibleForSave, setIsEligibleForSave] = useState(false);
   const [isEligibleDevEUIForSave, setIsEligibleDevEUIForSave] = useState(false);
-  const [isEligibleParameterForSave, setIsEligibleParameterForSave] = useState(false);
+  const [isEligibleParameterForSave, setIsEligibleParameterForSave] =
+    useState(false);
   const [errors, setErrors] = useState({});
 
   const farmer_companies = APP_CONST.farmer_companies;
   const orgName = user.orgName;
   // Fetch data inside the component
   const fetchAlertData = async () => {
-    const responses = await Promise.all([getDevices(user), getAdvisorySettings(user)]);
+    const responses = await Promise.all([
+      getDevices(user),
+      getAdvisorySettings(user),
+    ]);
     const devices = responses[0]["value"];
     const advisorySettings = responses[1]["value"];
     return { devices, advisorySettings };
@@ -42,7 +46,7 @@ export const SettingPage = () => {
   // Update state when data is fetched
   useEffect(() => {
     if (data) {
-      // Getting device list 
+      // Getting device list
       const deviceList = data.devices.reduce((acc, device) => {
         if (!acc[device.devEUI]) {
           acc[device.devEUI] = null;
@@ -68,23 +72,21 @@ export const SettingPage = () => {
           parameter: dt.parameter,
           orgName: dt.orgName,
           paramDisplayName: dt.paramDisplayName,
-          repeatedAlert: dt.repeatedAlert
-        })
+          repeatedAlert: dt.repeatedAlert,
+        });
       });
 
       // Getting settings the data
       const settingsData = Object.entries(organizedData).map(
-        ([
-          devEUI,
-          parameters,
-        ]) => {
+        ([devEUI, parameters]) => {
           let devName = deviceList[devEUI];
           return {
             devName,
             devEUI,
-            parameters
-          }
-        });
+            parameters,
+          };
+        }
+      );
       setSettings(settingsData);
     }
   }, [data, user]);
@@ -96,7 +98,9 @@ export const SettingPage = () => {
   // Validate the lt and gt values based on APP_CONST parameters
   const validateValues = (devEUI, parameterKey, field, value) => {
     const selectedDevice = settings.find((s) => s?.devEUI === devEUI);
-    const selectedSetting = selectedDevice.parameters.find((s) => s?.parameter === parameterKey);
+    const selectedSetting = selectedDevice.parameters.find(
+      (s) => s?.parameter === parameterKey
+    );
     let isValid = true;
     let errorMsg = "";
     switch (field) {
@@ -144,7 +148,9 @@ export const SettingPage = () => {
     const apiSaveUrl = setAdvisorySettings(user);
     try {
       let selectedDevice = settings.find((s) => s?.devEUI === devEUI);
-      let selectedSetting = selectedDevice.parameters.find((s) => s?.parameter === parameter);
+      let selectedSetting = selectedDevice.parameters.find(
+        (s) => s?.parameter === parameter
+      );
       selectedSetting = { ...selectedSetting, devEUI: devEUI };
       console.log("selectedSetting :", selectedSetting);
       if (selectedSetting.length === 0) {
@@ -164,7 +170,12 @@ export const SettingPage = () => {
 
   // Auto-save on blur
   const handleBlur = async (devEUI, parameter, field, value) => {
-    const { isValid, errorMsg } = validateValues(devEUI, parameter, field, value);
+    const { isValid, errorMsg } = validateValues(
+      devEUI,
+      parameter,
+      field,
+      value
+    );
     if (isValid) {
       const updatedSettings = settings.map((s) => {
         if (s.devEUI === devEUI) {
@@ -173,7 +184,7 @@ export const SettingPage = () => {
               p[field] = Number(value);
             }
             return p;
-          })
+          });
         }
         return s;
       });
@@ -247,18 +258,35 @@ export const SettingPage = () => {
               <div>
                 {settings.map((setting, index) => (
                   <div key={index}>
-                    <h5><b>{setting.devName} :</b> {setting.devEUI}</h5>
-                    <div className="chartbox dbb" style={{ "marginTop": "10px" }}>
+                    <h5>
+                      <b>{setting.devName} :</b> {setting.devEUI}
+                    </h5>
+                    <div
+                      className={`chartbox dbb ${styles.tableContainer}`}
+                      style={{ marginTop: "10px", marginBottom: "30px" }}
+                    >
                       <table
                         id="datatable"
                         className={`table table-striped table-bordered ${styles.table}`}
                       >
                         <thead>
                           <tr>
-                            <th style={{ textAlign: "center" }}>Active</th>
-                            <th style={{ textAlign: "center" }}>Alert</th>
+                            <th
+                              className={`${styles.stickyColumn1}`}
+                              style={{ textAlign: "center" }}
+                            >
+                              Active
+                            </th>
+                            <th
+                              className={`${styles.stickyColumn2}`}
+                              style={{ textAlign: "center" }}
+                            >
+                              Alert
+                            </th>
                             <th style={{ textAlign: "center" }}>Minimum</th>
-                            <th style={{ textAlign: "center" }}>Low Threshold</th>
+                            <th style={{ textAlign: "center" }}>
+                              Low Threshold
+                            </th>
                             <th style={{ textAlign: "center" }}>
                               High Threshold
                             </th>
@@ -268,7 +296,7 @@ export const SettingPage = () => {
                         <tbody>
                           {setting.parameters.map((param, index) => (
                             <tr key={index}>
-                              <td>
+                              <td className={`${styles.stickyColumn1}`}>
                                 <label className="switch">
                                   <input
                                     type="checkbox"
@@ -278,25 +306,32 @@ export const SettingPage = () => {
                                         prev.map((s) => {
                                           if (s.devEUI === setting.devEUI) {
                                             s.parameters.map((p) => {
-                                              if (p.parameter === param.parameter) {
-                                                p.alertActive = e.target.checked;
+                                              if (
+                                                p.parameter === param.parameter
+                                              ) {
+                                                p.alertActive =
+                                                  e.target.checked;
                                               }
                                               return p;
-                                            })
+                                            });
                                           }
                                           return s;
-                                        })
+                                        });
                                         return prev;
                                       });
-                                      setIsEligibleDevEUIForSave(setting.devEUI);
-                                      setIsEligibleParameterForSave(param.parameter);
+                                      setIsEligibleDevEUIForSave(
+                                        setting.devEUI
+                                      );
+                                      setIsEligibleParameterForSave(
+                                        param.parameter
+                                      );
                                       setIsEligibleForSave(true);
                                     }}
                                   />
                                   <span className="slider round"></span>
                                 </label>
                               </td>
-                              <td>
+                              <td className={`${styles.stickyColumn2}`}>
                                 <span>{param.paramDisplayName}</span>
                                 <input type="hidden" value={param.parameter} />
                               </td>
@@ -308,26 +343,40 @@ export const SettingPage = () => {
                                       <input
                                         type="checkbox"
                                         checked={
-                                          param.min_value > 0 && param.max_value > 0
+                                          param.min_value > 0 &&
+                                          param.max_value > 0
                                         }
                                         onChange={(e) => {
                                           setSettings((prev) => {
                                             prev.map((s) => {
                                               if (s.devEUI === setting.devEUI) {
                                                 s.parameters.map((p) => {
-                                                  if (p.parameter === param.parameter) {
-                                                    p.min_value = e.target.checked ? 1 : 0;
-                                                    p.max_value = e.target.checked ? 1 : 0;
+                                                  if (
+                                                    p.parameter ===
+                                                    param.parameter
+                                                  ) {
+                                                    p.min_value = e.target
+                                                      .checked
+                                                      ? 1
+                                                      : 0;
+                                                    p.max_value = e.target
+                                                      .checked
+                                                      ? 1
+                                                      : 0;
                                                   }
                                                   return p;
-                                                })
+                                                });
                                               }
                                               return s;
-                                            })
+                                            });
                                             return prev;
                                           });
-                                          setIsEligibleDevEUIForSave(setting.devEUI);
-                                          setIsEligibleParameterForSave(param.parameter);
+                                          setIsEligibleDevEUIForSave(
+                                            setting.devEUI
+                                          );
+                                          setIsEligibleParameterForSave(
+                                            param.parameter
+                                          );
                                           setIsEligibleForSave(true);
                                         }}
                                       />
@@ -339,7 +388,9 @@ export const SettingPage = () => {
                                   <OutlinedInput
                                     startAdornment={
                                       <InputAdornment position="start">
-                                        <ErrorOutline style={{ color: "red" }} />
+                                        <ErrorOutline
+                                          style={{ color: "red" }}
+                                        />
                                       </InputAdornment>
                                     }
                                     defaultValue={param.min_value}
@@ -353,7 +404,8 @@ export const SettingPage = () => {
                                     }
                                     disabled={!param.alertActive}
                                     error={
-                                      errors[`${param.parameter}_min_value`] || false
+                                      errors[`${param.parameter}_min_value`] ||
+                                      false
                                     }
                                     style={{
                                       borderColor: errors[
@@ -376,7 +428,9 @@ export const SettingPage = () => {
                                   <OutlinedInput
                                     startAdornment={
                                       <InputAdornment position="start">
-                                        <ErrorOutline style={{ color: "red" }} />
+                                        <ErrorOutline
+                                          style={{ color: "red" }}
+                                        />
                                       </InputAdornment>
                                     }
                                     defaultValue={param.currentMinAlert}
@@ -390,7 +444,9 @@ export const SettingPage = () => {
                                     }
                                     disabled={!param.alertActive}
                                     error={
-                                      errors[`${param.parameter}_currentMinAlert`] || false
+                                      errors[
+                                        `${param.parameter}_currentMinAlert`
+                                      ] || false
                                     }
                                     style={{
                                       borderColor: errors[
@@ -415,7 +471,9 @@ export const SettingPage = () => {
                                   <OutlinedInput
                                     startAdornment={
                                       <InputAdornment position="start">
-                                        <ErrorOutline style={{ color: "red" }} />
+                                        <ErrorOutline
+                                          style={{ color: "red" }}
+                                        />
                                       </InputAdornment>
                                     }
                                     defaultValue={param.currentMaxAlert}
@@ -429,7 +487,9 @@ export const SettingPage = () => {
                                     }
                                     disabled={!param.alertActive}
                                     error={
-                                      errors[`${param.parameter}_currentMaxAlert`] || false
+                                      errors[
+                                        `${param.parameter}_currentMaxAlert`
+                                      ] || false
                                     }
                                     style={{
                                       borderColor: errors[
@@ -454,7 +514,9 @@ export const SettingPage = () => {
                                   <OutlinedInput
                                     startAdornment={
                                       <InputAdornment position="start">
-                                        <ErrorOutline style={{ color: "red" }} />
+                                        <ErrorOutline
+                                          style={{ color: "red" }}
+                                        />
                                       </InputAdornment>
                                     }
                                     defaultValue={param.max_value}
@@ -468,7 +530,8 @@ export const SettingPage = () => {
                                     }
                                     disabled={!param.alertActive}
                                     error={
-                                      errors[`${param.parameter}_max_value`] || false
+                                      errors[`${param.parameter}_max_value`] ||
+                                      false
                                     }
                                     style={{
                                       borderColor: errors[
