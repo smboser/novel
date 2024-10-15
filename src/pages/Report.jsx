@@ -11,11 +11,12 @@ import { AvgParameters } from "../components/avg_parameters";
 import { DeviceList } from "../components/deviceList";
 import { AlertAdvisories } from "../components/alert_advisories";
 import { DetailedAnalytics } from "../components/detailed_analytics";
-import { filterLatestAlerts, getOrganizedAdvisorySettings, getOrganizedParameters } from "../helper/utils";
+import { getOrganizedAdvisorySettings, getOrganizedParameters, getOrganizedSensorData } from "../helper/utils";
 export const ReportPage = () => {
     const { user } = useAuth();
     const [isLoaderVisible, setLoaderVisible] = useState(false);
     const [settings, setSettings] = useState([]);
+    const [parameters, setParameters] = useState([]);
     const [series, setSeries] = useState(null);
     const [devices, setDevices] = useState([]);
     const [selectedDevices, setSelectedDevices] = useState([]);
@@ -35,54 +36,26 @@ export const ReportPage = () => {
             getSensorData(user)         // Call API to get sensor data
         ]).then((reponses) => {
             console.log(" ---- ALL DAta Fetching ----")
-            // Organized advisory settings
+            // Organized parameters
             let repAdvisorySettings = reponses[0]["value"];
+            let parameters = getOrganizedParameters(repAdvisorySettings);
+            console.log("Organized Parameters:", parameters);
             let organizedAdvisorySettings = getOrganizedAdvisorySettings(repAdvisorySettings);
-            console.log("Organized Advisory Settings:", organizedAdvisorySettings);
+            console.log("Organized Advisory Settings:", organizedAdvisorySettings)
 
             // Organized sensor data
             let repSensorData = reponses[1]["value"];
-            let activeAdvisorySettings = Object.keys(organizedAdvisorySettings);
-            debugger;
-            let seriesData = {};
-            let latestData = {};
-            let deviceList = new Set();
-            repSensorData.forEach(value => {
-                let devName = value.devName;
-                let instData = { "timestamp": value.Timestamp };
-                activeAdvisorySettings.forEach((setname) => {
-                    instData[setname] = value[setname];
-                });
-
-                if (!seriesData[devName]) {
-                    seriesData[devName] = [];
-                }
-
-                if (!latestData[devName]) {
-                    latestData[devName] = {};
-                }
-
-                // Added devices name
-                deviceList.add(devName);
-                // Push sensore data
-                seriesData[devName].push(instData);
-                // Push last 24 hours data
-                if (Object.keys(latestData[devName]) == 0) {
-                    latestData[devName] = instData;
-                } else if (new Date(value.Timestamp) > new Date(latestData[devName].timestamp)) {
-                    latestData[devName] = instData;
-                }
-            });
-
+            let { seriesData, latestData, deviceList } = getOrganizedSensorData(repSensorData, Object.keys(parameters));
             console.log("Series Data:", seriesData);
             console.log("Latest Data:", latestData);
+            console.log("DeviceList:", deviceList);
 
             // Find the unique devices
-            deviceList = Array.from(deviceList);
             setSettings(organizedAdvisorySettings);
+            setParameters(parameters);
             setSeries(seriesData);
             setDevices(deviceList);
-            setSelectedDevices(deviceList);
+            setSelectedDevices(deviceList.map((device) => device.devEUI));
             setLast24HourEachDevice(latestData);
             setLoaderVisible(false);
         });
@@ -159,7 +132,7 @@ export const ReportPage = () => {
                                         (last24HourEachDevice)
                                             ?
                                             <AvgParameters
-                                                settings={settings}
+                                                parameters={parameters}
                                                 selectedDevices={selectedDevices}
                                                 last24HoursData={last24HourEachDevice}
                                             />
@@ -172,7 +145,7 @@ export const ReportPage = () => {
                                         (series)
                                             ?
                                             <DetailedAnalytics
-                                                settings={settings}
+                                                parameters={parameters}
                                                 devices={devices}
                                                 selectedDevices={selectedDevices}
                                                 series={series}

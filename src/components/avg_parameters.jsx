@@ -2,28 +2,10 @@ import React from 'react';
 import { GaugeChart } from "../components/GaugeChart";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
+import { APP_CONST } from "../helper/application-constant";
 
-export const AvgParameters = ({ settings, selectedDevices, last24HoursData }) => {
-    const responsive = {
-        superLargeDesktop: {
-            // the naming can be any, depends on you.
-            breakpoint: { max: 4000, min: 3000 },
-            items: 5
-        },
-        desktop: {
-            breakpoint: { max: 3000, min: 1024 },
-            items: 4
-        },
-        tablet: {
-            breakpoint: { max: 1024, min: 464 },
-            items: 2
-        },
-        mobile: {
-            breakpoint: { max: 464, min: 0 },
-            items: 1
-        }
-    };
-
+export const AvgParameters = ({ parameters, selectedDevices, last24HoursData }) => {
+    const responsive = APP_CONST.avg_device_data_responsive_parameter;
     return (
         <Carousel
             className="row"
@@ -34,11 +16,11 @@ export const AvgParameters = ({ settings, selectedDevices, last24HoursData }) =>
             autoPlaySpeed={1000}
         >
 
-            {settings ? Object.keys(settings).map((stname, i) => {
-                let setting = settings[stname];
+            {parameters ? Object.keys(parameters).map((parameter, i) => {
+                let param = parameters[parameter];
                 return (
                     <div key={i} className="col-md-4 col-sm-6 col-xs-12" style={{ "width": "100%", "paddingTop": "10px", "paddingBottom": "10px" }}>
-                        <GaugeChart setting={setting} selectedDevices={selectedDevices} last24HoursData={last24HoursData} />
+                        <GaugeChart param={param} selectedDevices={selectedDevices} last24HoursData={last24HoursData} />
                     </div>
                 );
             }) : <div />}

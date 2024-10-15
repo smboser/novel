@@ -1,67 +1,11 @@
 import React from 'react';
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
-
+import { getAlertAdvisories } from "../helper/utils";
+import { APP_CONST } from "../helper/application-constant";
 export const AlertAdvisories = ({ settings, last24HoursData }) => {
-    const responsive = {
-        superLargeDesktop: {
-            // the naming can be any, depends on you.
-            breakpoint: { max: 4000, min: 3000 },
-            items: 5
-        },
-        desktop: {
-            breakpoint: { max: 3000, min: 1024 },
-            items: 3
-        },
-        tablet: {
-            breakpoint: { max: 1024, min: 464 },
-            items: 2
-        },
-        mobile: {
-            breakpoint: { max: 464, min: 0 },
-            items: 1
-        }
-    };
-
-    // Organized data
-    let advisoriesData = [];
-    let devices = Object.keys(last24HoursData);
-    Object.keys(settings).forEach((setname) => {
-        let setting = settings[setname];
-        let { paramDisplayName, unit, currentMinAlert, currentMaxAlert, parameter } = setting;
-
-
-        devices.forEach((device) => {
-            let data = last24HoursData[device];
-            let curval = data[parameter];
-            // For exceeded
-            if (typeof (currentMaxAlert) != "undefined" && currentMaxAlert && curval > currentMaxAlert) {
-                let altdata = {
-                    "devName": device,
-                    "parameter": parameter,
-                    "name": paramDisplayName,
-                    "unit": unit,
-                    "value": curval,
-                    "msg": `${device} has exceeded ${parameter}`
-                }
-                advisoriesData.push(altdata);
-            }
-
-            // For subceeded
-            if (typeof (currentMinAlert) != "undefined" && currentMinAlert && curval < currentMinAlert) {
-                let altdata = {
-                    "devName": device,
-                    "parameter": parameter,
-                    "name": paramDisplayName,
-                    "unit": unit,
-                    "value": curval,
-                    "msg": `${device} has subceeded ${parameter}`
-                }
-                advisoriesData.push(altdata);
-            }
-        });
-    });
-
+    const responsive = APP_CONST.alert_advisories_responsive_parameter;
+    const advisoriesData = getAlertAdvisories(settings, last24HoursData);
     return (
         <Carousel
             className="row"

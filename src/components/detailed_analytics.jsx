@@ -3,7 +3,7 @@ import Plot from 'react-plotly.js';
 import moment from 'moment';
 import { useState, useEffect } from "react";
 
-export const DetailedAnalytics = ({ settings, devices, selectedDevices, series, selectedHourly, selectedParam, setSelectedHourly, setSelectedParam }) => {
+export const DetailedAnalytics = ({ parameters, devices, selectedDevices, series, selectedHourly, selectedParam, setSelectedHourly, setSelectedParam }) => {
     const [organizedSerieData, setOrganizedSerieData] = useState([]);
     const detailedAnalyticsData = () => {
         let pdt = moment().add(-1, 'hours');
@@ -29,11 +29,11 @@ export const DetailedAnalytics = ({ settings, devices, selectedDevices, series, 
             let xArr = [];
             let yArr = [];
             // If device is not in the selected list
-            if (!selectedDevices.includes(device)) {
+            if (!selectedDevices.includes(device.devEUI)) {
                 return;
             }
             // Get the data for device
-            let data = series[device];
+            let data = series[device.devEUI];
             data.forEach(s => {
                 let cdt = moment(s.timestamp);
                 let yval = s[selectedParam];
@@ -53,7 +53,7 @@ export const DetailedAnalytics = ({ settings, devices, selectedDevices, series, 
                     line: {
                         width: 1
                     },
-                    name: device,
+                    name: device.devName,
                 });
             }
         });
@@ -107,10 +107,10 @@ export const DetailedAnalytics = ({ settings, devices, selectedDevices, series, 
                         value={selectedParam}
                         onChange={handleParamFilterChange}
                         style={{"marginLeft":"10px"}}>
-                        {Object.keys(settings).map((setname, i) => {
-                            let setting = settings[setname];
+                        {Object.keys(parameters).map((parameter, i) => {
+                            let param = parameters[parameter];
                             return (
-                                <option key={i} value={setting.parameter}>{setting.paramDisplayName}</option>
+                                <option key={i} value={param.parameter}>{param.paramDisplayName}</option>
                             )
                         })}
                     </select>
@@ -143,7 +143,7 @@ export const DetailedAnalytics = ({ settings, devices, selectedDevices, series, 
                         useResizeHandler={true}
                         style={{ width: "100%" }}
                     />
-                    : <div style={{ "paddingTop": "50px", "paddingBottom": "80px" }}><b>No device selected</b></div>
+                    : <div style={{ "paddingTop": "50px", "paddingBottom": "80px" }}><b>No data found</b></div>
             }
         </>
     );

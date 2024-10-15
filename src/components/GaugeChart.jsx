@@ -1,11 +1,9 @@
 import React from "react";
 import { GaugeComponent } from "react-gauge-component";
 import { calculateAvgLatestData } from "../helper/utils";
-import { useAuth } from "../hooks/useAuth";
-import { APP_CONST } from "../helper/application-constant";
-export const GaugeChart = ({ setting, selectedDevices, last24HoursData }) => {
-  let { min_value, max_value, currentMinAlert, currentMaxAlert, parameter } = setting;
-  // Calculate low thohresld and high thohresld
+export const GaugeChart = ({ param, selectedDevices, last24HoursData }) => {
+  let { min_value, max_value, currentMinAlert, currentMaxAlert, parameter, paramDisplayName, unit } = param;
+  // Find low thohresld and high thohresld
   let low_thohresld = Math.floor(
     currentMinAlert ? (currentMinAlert < min_value ? min_value : currentMinAlert) : min_value
   );
@@ -15,15 +13,12 @@ export const GaugeChart = ({ setting, selectedDevices, last24HoursData }) => {
   // Calculate average
   let avg = calculateAvgLatestData(last24HoursData, parameter, selectedDevices);
   console.log(`Inside GaugeChart component`);
-  console.log(`Values of ${setting.parameter} parameter:`, setting);
+  console.log(`Values of ${parameter} parameter:`, param);
   console.log(`Values of latest data :`, last24HoursData);
   console.log(
     `Values of min :${min_value} and max:${max_value} and low thohresld : ${low_thohresld} and high thohresld : ${high_thohresld}`
   );
   console.log(`Values of avg :${avg}`);
-  const { user } = useAuth();
-  const farmer_companies = APP_CONST.farmer_companies;
-
   return (
     <>
       <div className="gauge">
@@ -81,12 +76,12 @@ export const GaugeChart = ({ setting, selectedDevices, last24HoursData }) => {
           maxValue={max_value}
         />
         <div className="info">
-          <h5>{setting.paramDisplayName}</h5>
+          <h5>{paramDisplayName}</h5>
         </div>
       </div>
 
       <div className="reading_gauge">
-        {avg}{" "} {setting.unit}
+        {avg}{" "} {unit}
       </div>
     </>
   );

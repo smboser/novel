@@ -75,23 +75,11 @@ export const filterLatestAlerts = (data) => {
   return filteredData;
 };
 
+
+
 export const getOrganizedParameters = (data) => {
-  const parameters = data.value.reduce((acc, param) => {
-    if (!acc[param.parameter] && param.parameter != "leakage_status") {
-      acc[param.parameter] = {
-        name: param.paramDisplayName,
-        unit: param.unit
-      };
-    }
-    return acc;
-  }, {});
-  return parameters;
-}
-
-
-export const getOrganizedAdvisorySettings = (data) => {
   const advisorySettings = data.reduce((acc, alert) => {
-    if (alert.alertActive && alert.parameter != "leakage_status") {
+    if (alert.parameter != "leakage_status") {
       let parameter = alert.parameter;
       if (!acc[parameter]) {
         acc[parameter] = {
@@ -128,11 +116,124 @@ export const getOrganizedAdvisorySettings = (data) => {
   return advisorySettings;
 }
 
+export const getOrganizedAdvisorySettings = (data) => {
+  const organizedData = {};
+  data.forEach((dt) => {
+    let devEUI = dt.devEUI;
+    if (!organizedData[devEUI]) {
+      organizedData[devEUI] = [];
+    }
+    organizedData[devEUI].push({
+      min_value: dt.min_value,
+      max_value: dt.max_value,
+      avg_value: dt.avg_value,
+      currentMinAlert: dt.currentMinAlert,
+      currentMaxAlert: dt.currentMaxAlert,
+      alertActive: dt.alertActive,
+      parameter: dt.parameter,
+      orgName: dt.orgName,
+      paramDisplayName: dt.paramDisplayName,
+      repeatedAlert: dt.repeatedAlert
+    });
+  });
+  return organizedData;
+}
+
+export const getOrganizedSensorData = (data, parameters) => {
+  let seriesData = {};
+  let latestData = {};
+  let deviceList = [];
+  data.forEach(value => {
+    let devName = value.devName;
+    let devEUI = value.devEUI;
+    // For series data
+    if (!seriesData[devEUI]) {
+      seriesData[devEUI] = [];
+      // Added device as it is new device
+      deviceList.push({
+        "devName": devName,
+        "devEUI": devEUI
+      });
+    }
+    // For last 24 hours data
+    if (!latestData[devEUI]) {
+      latestData[devEUI] = {};
+    }
+
+    let instData = {
+      "timestamp": value.Timestamp,
+      "devName": devName,
+      "devEUI": devEUI
+    };
+    parameters.forEach((parameter) => {
+      instData[parameter] = value[parameter];
+    });
+
+
+    // Push into series data array
+    seriesData[devEUI].push(instData);
+    // Push into last 24 hours data
+    if (Object.keys(latestData[devEUI]) == 0) {
+      latestData[devEUI] = instData;
+    } else if (new Date(value.Timestamp) > new Date(latestData[devEUI].timestamp)) {
+      latestData[devEUI] = instData;
+    }
+  });
+  return {
+    "seriesData": seriesData,
+    "latestData": latestData,
+    "deviceList": deviceList
+  }
+}
+
+export const getAlertAdvisories = (settings, last24HoursData) => {
+  // Organized data
+  let advisoriesData = [];
+  Object.keys(settings).forEach((devEUI) => {
+    let parameters = settings[devEUI];
+    parameters.forEach((param) => {
+      let { paramDisplayName, unit, currentMinAlert, currentMaxAlert, parameter, alertActive } = param;
+      if(typeof (last24HoursData[devEUI]) == "undefined" || !alertActive) {
+          return true;
+      }
+      let curval = last24HoursData[devEUI][parameter];
+      let devName = last24HoursData[devEUI]["devName"];
+      // For exceeded
+      if (typeof (currentMaxAlert) != "undefined" && currentMaxAlert && curval > currentMaxAlert) {
+        let altdata = {
+          "devName": devName,
+          "parameter": parameter,
+          "name": paramDisplayName,
+          "unit": unit,
+          "value": curval,
+          "msg": `${devName} has exceeded ${parameter}`
+        }
+        advisoriesData.push(altdata);
+      }
+
+      // For subceeded
+      if (typeof (currentMinAlert) != "undefined" && currentMinAlert && curval < currentMinAlert) {
+        let altdata = {
+          "devName": devName,
+          "parameter": parameter,
+          "name": paramDisplayName,
+          "unit": unit,
+          "value": curval,
+          "msg": `${devName} has subceeded ${parameter}`
+        }
+        advisoriesData.push(altdata);
+      }
+    });
+  });
+  return advisoriesData;
+}
+
+
 export const calculateAvgLatestData = (latestData, parameter, selectedDevices) => {
   let total = 0, count = 0;
-  Object.keys(latestData).forEach(devname => {
-    if (typeof (latestData[devname][parameter]) != "undefined" && selectedDevices.includes(devname)) {
-      total += latestData[devname][parameter];
+  Object.keys(latestData).forEach(devEUI => {
+    if (typeof (latestData[devEUI][parameter]) != "undefined" && selectedDevices.includes(devEUI)) {
+      total += latestData[devEUI][parameter];
       count += 1;
     }
   });

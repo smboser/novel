@@ -14,11 +14,11 @@ export const DeviceList = ({deviceList, selectedDeviceList, changeHandeler}) => 
                         <li key={i}>
                             <input
                                 type="checkbox"
-                                value={device}
-                                checked={selectedDevices.includes(device)} 
+                                value={device.devEUI}
+                                checked={selectedDevices.includes(device.devEUI)} 
                                 onChange={changeHandeler}
                             />
-                            <label>{device}</label>
+                            <label>{device.devName}</label>
                         </li>
                     )
                 })
