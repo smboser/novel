@@ -1,5 +1,5 @@
 import { APP_CONST } from "./application-constant";
-import moment  from "moment";
+import moment from "moment";
 
 const requestHeader = {
   Accept: "application/json",
@@ -71,22 +71,26 @@ export const getDevices = (userInfo) => {
 
 export const getSensorData = (userInfo) => {
   // For URL
-  let url = `https://prod-00.australiaeast.logic.azure.com:443/workflows/06f427a8821a480299756c737b774c60/triggers/When_a_HTTP_request_is_received/paths/invoke`;
+  let url = `${
+    import.meta.env.VITE_GET_SENSOR_API_URL
+  }/workflows/06f427a8821a480299756c737b774c60/triggers/When_a_HTTP_request_is_received/paths/invoke`;
   url = `${url}?api-version=${APP_CONST.API_VERSION}`;
   url = `${url}&sp=${APP_CONST.SP}`;
   url = `${url}&sv=${APP_CONST.SV}`;
   url = `${url}&sig=wRTuMv158QzmYIxy3B-fc9lvAb8S83QTbnwR-PZQL14`;
   url = `${url}&orgName=${userInfo.orgName}`;
   url = `${url}&authToken=${userInfo.token}`;
-  url = `${url}&dateStart=${moment().subtract(7, "days").format('YYYY-MM-DD')}`;
-  url = `${url}&dateEnd=${moment().format('YYYY-MM-DD')}`;
+  url = `${url}&dateStart=${moment().subtract(7, "days").format("YYYY-MM-DD")}`;
+  url = `${url}&dateEnd=${moment().format("YYYY-MM-DD")}`;
   // Call end point
   return getRequest(url);
 };
 
 export const getAdvisorySettingData = (userInfo) => {
   // For URL
-  let url = `https://prod-07.australiaeast.logic.azure.com:443/workflows/86ea5a4f3b8543f39308cba0e6a34afd/triggers/When_a_HTTP_request_is_received/paths/invoke`;
+  let url = `${
+    import.meta.env.VITE_SET_ADV_API_URL
+  }/workflows/86ea5a4f3b8543f39308cba0e6a34afd/triggers/When_a_HTTP_request_is_received/paths/invoke`;
   url = `${url}?api-version=${APP_CONST.API_VERSION}`;
   url = `${url}&sp=${APP_CONST.SP}`;
   url = `${url}&sv=${APP_CONST.SV}`;
@@ -99,7 +103,9 @@ export const getAdvisorySettingData = (userInfo) => {
 };
 
 export const getParameters = (userInfo) => {
-  let url = `https://prod-23.australiaeast.logic.azure.com:443/workflows/af8858ba45c141d9a134be3243dc1d97/triggers/When_a_HTTP_request_is_received/paths/invoke`;
+  let url = `${
+    import.meta.env.VITE_GET_PARAM_API_URL
+  }/workflows/af8858ba45c141d9a134be3243dc1d97/triggers/When_a_HTTP_request_is_received/paths/invoke`;
   url = `${url}?api-version=${APP_CONST.API_VERSION}`;
   url = `${url}&sp=${APP_CONST.SP}`;
   url = `${url}&sv=${APP_CONST.SV}`;
@@ -114,7 +120,9 @@ export const getParameters = (userInfo) => {
 // src/helper/web-service.js
 export const getAdvisorySettings = (userInfo) => {
   // For URL
-  let url = `https://prod-30.australiaeast.logic.azure.com:443/workflows/f9721efd19cd43d88b6c210f7e6d6285/triggers/When_a_HTTP_request_is_received/paths/invoke`;
+  let url = `${
+    import.meta.env.VITE_GET_ADV_API_URL
+  }/workflows/f9721efd19cd43d88b6c210f7e6d6285/triggers/When_a_HTTP_request_is_received/paths/invoke`;
   url = `${url}?api-version=${APP_CONST.API_VERSION}`;
   url = `${url}&sp=${APP_CONST.SP}`;
   url = `${url}&sv=${APP_CONST.SV}`;
@@ -127,7 +135,9 @@ export const getAdvisorySettings = (userInfo) => {
 };
 
 export const setAdvisorySettings = (userInfo) => {
-  let url = `https://prod-19.australiaeast.logic.azure.com:443/workflows/fae611fcbcdc4cd69a01623fda100949/triggers/When_a_HTTP_request_is_received/paths/invoke`;
+  let url = `${
+    import.meta.env.VITE_SET_ADV_SETTINGS_API_URL
+  }/workflows/fae611fcbcdc4cd69a01623fda100949/triggers/When_a_HTTP_request_is_received/paths/invoke`;
   url = `${url}?api-version=${APP_CONST.API_VERSION}`;
   url = `${url}&sp=${APP_CONST.SP}`;
   url = `${url}&sv=${APP_CONST.SV}`;
@@ -139,7 +149,9 @@ export const setAdvisorySettings = (userInfo) => {
 };
 
 export const getMinMaxAdvisorySettings = (userInfo) => {
-  let url = `https://prod-23.australiaeast.logic.azure.com:443/workflows/af8858ba45c141d9a134be3243dc1d97/triggers/When_a_HTTP_request_is_received/paths/invoke`;
+  let url = `${
+    import.meta.env.VITE_GET_PARAM_API_URL
+  }/workflows/af8858ba45c141d9a134be3243dc1d97/triggers/When_a_HTTP_request_is_received/paths/invoke`;
   url = `${url}?api-version=${APP_CONST.API_VERSION}`;
   url = `${url}&sp=${APP_CONST.SP}`;
   url = `${url}&sv=${APP_CONST.SV}`;
@@ -151,7 +163,9 @@ export const getMinMaxAdvisorySettings = (userInfo) => {
 };
 
 export const getValveSettings = (userInfo) => {
-  let url = `https://prod-11.australiaeast.logic.azure.com:443/workflows/1222197568d24a4d90e07180c61d2907/triggers/When_a_HTTP_request_is_received/paths/invoke`;
+  let url = `${
+    import.meta.env.VITE_GET_VALVE_API_URL
+  }/workflows/1222197568d24a4d90e07180c61d2907/triggers/When_a_HTTP_request_is_received/paths/invoke`;
   url = `${url}?api-version=${APP_CONST.API_VERSION}`;
   url = `${url}&sp=${APP_CONST.SP}`;
   url = `${url}&sv=${APP_CONST.SV}`;
@@ -163,7 +177,9 @@ export const getValveSettings = (userInfo) => {
 };
 
 export const setValveSettings = (userInfo) => {
-  let url = `https://prod-13.australiaeast.logic.azure.com:443/workflows/c4db9b21ccab4107aebc33f6adc8c554/triggers/When_a_HTTP_request_is_received/paths/invoke`;
+  let url = `${
+    import.meta.env.VITE_SET_VALVE_API_URL
+  }/workflows/c4db9b21ccab4107aebc33f6adc8c554/triggers/When_a_HTTP_request_is_received/paths/invoke`;
   url = `${url}?api-version=${APP_CONST.API_VERSION}`;
   url = `${url}&sp=${APP_CONST.SP}`;
   url = `${url}&sv=${APP_CONST.SV}`;
