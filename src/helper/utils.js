@@ -1,4 +1,5 @@
 import { APP_CONST } from "../helper/application-constant";
+import moment from 'moment';
 
 export function differenceDate(date_past, date_now) {
   let date_past_time = date_past.getTime();
@@ -143,6 +144,8 @@ export const getOrganizedSensorData = (data, parameters) => {
   let seriesData = {};
   let latestData = {};
   let deviceList = [];
+  let dailyRainfall = 0;
+  let currentDay = null;
   data.forEach(value => {
     let devName = value.devName;
     let devEUI = value.devEUI;
@@ -165,8 +168,26 @@ export const getOrganizedSensorData = (data, parameters) => {
       "devName": devName,
       "devEUI": devEUI
     };
+
+
     parameters.forEach((parameter) => {
-      instData[parameter] = value[parameter];
+      let fvalue = value[parameter] || null;
+      switch (parameter) {
+        case "rainfall_total":
+          if(fvalue != null ) {
+            let day = moment(value.Timestamp).format('YYYY-MM-DD');
+            if (day !== currentDay) {
+              dailyRainfall = 0;
+              currentDay = day;
+            }
+            dailyRainfall += fvalue;
+            instData[parameter] = dailyRainfall;
+            break;
+          }
+        default:
+          instData[parameter] = fvalue;
+          break;
+      }
     });
 
 
@@ -193,8 +214,8 @@ export const getAlertAdvisories = (settings, last24HoursData) => {
     let parameters = settings[devEUI];
     parameters.forEach((param) => {
       let { paramDisplayName, unit, currentMinAlert, currentMaxAlert, parameter, alertActive } = param;
-      if(typeof (last24HoursData[devEUI]) == "undefined" || !alertActive) {
-          return true;
+      if (typeof (last24HoursData[devEUI]) == "undefined" || !alertActive) {
+        return true;
       }
       let curval = last24HoursData[devEUI][parameter];
       let devName = last24HoursData[devEUI]["devName"];

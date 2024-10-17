@@ -79,7 +79,7 @@ export const ReportPage = () => {
         event.stopPropagation();
         event.preventDefault();
         console.log("--- Inside handleChecked ---")
-        setSelectedDevices(devices);
+        setSelectedDevices(devices.map((device) => device.devEUI));
     };
 
     const handleUnchecked = (event) => {
@@ -110,8 +110,8 @@ export const ReportPage = () => {
                             <div className="col-md-2 col-sm-3 col-xs-12">
                                 <h2 className="dev_ttlmain">Devices</h2>
                                 <div className="dbb chtbox">
-                                    <span className="label label-primary" style={{ "cursor": "pointer" }} onClick={handleChecked}>Checked</span>
-                                    <span className="label label-primary" style={{ "marginLeft": "10px", "cursor": "pointer" }} onClick={handleUnchecked}>Unchecked</span>
+                                    <span className="label label-primary" style={{ "padding": "6px","cursor": "pointer"}} onClick={handleChecked}>Checked</span>
+                                    <span className="label label-primary" style={{ "padding": "6px","cursor": "pointer", "marginLeft": "10px" }} onClick={handleUnchecked}>Unchecked</span>
                                     <div className="list">
                                         {
                                             (devices.length > 0)
@@ -127,7 +127,7 @@ export const ReportPage = () => {
                             </div>
                             <div className="col-md-10 col-sm-9 col-xs-12">
                                 <h2 className="dev_ttlmain">All devices average</h2>
-                                <div className="dbb chartbox" style={{ "height": "220px" }}>
+                                <div className="dbb chartbox">
                                     {
                                         (last24HourEachDevice)
                                             ?
