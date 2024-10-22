@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import { CirclesWithBar } from "react-loader-spinner";
 import { userLogin } from "../helper/web-service";
 import { useAuth } from "../hooks/useAuth";
+import { sha512 } from "js-sha512";
 export const LoginPage = () => {
   const [companyPassword, setCompanyPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
@@ -21,7 +22,8 @@ export const LoginPage = () => {
       }
       setLoaderVisible(true);
       // Make base64 encryption for company password feild
-      let base64Password = btoa(companyPassword);
+      let base64Password = sha512(companyPassword);
+      console.log(base64Password);
       // Call API for login and getting data
       let data = await userLogin(base64Password);
       // Set user data
