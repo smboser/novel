@@ -80,36 +80,35 @@ export const filterLatestAlerts = (data) => {
 
 export const getOrganizedParameters = (data) => {
   const advisorySettings = data.reduce((acc, alert) => {
-    if (alert.parameter != "leakage_status") {
-      let parameter = alert.parameter;
-      if (!acc[parameter]) {
-        acc[parameter] = {
-          parameter: parameter,
-          paramDisplayName: alert.paramDisplayName,
-          orgName: alert.orgName,
-          currentMinAlert: alert.currentMinAlert,
-          min_value: alert.min_value,
-          currentMaxAlert: alert.currentMaxAlert,
-          max_value: alert.max_value,
-          unit: alert.unit,
-          active: alert.alertActive
-        };
-      }
-      if (acc[parameter]["min_value"] > alert.min_value) {
-        acc[parameter]["min_value"] = alert.min_value;
-      }
 
-      if (acc[parameter]["currentMaxAlert"] > alert.currentMaxAlert) {
-        acc[parameter]["currentMaxAlert"] = alert.currentMaxAlert;
-      }
+    let parameter = alert.parameter;
+    if (!acc[parameter]) {
+      acc[parameter] = {
+        parameter: parameter,
+        paramDisplayName: alert.paramDisplayName,
+        orgName: alert.orgName,
+        currentMinAlert: alert.currentMinAlert,
+        min_value: alert.min_value,
+        currentMaxAlert: alert.currentMaxAlert,
+        max_value: alert.max_value,
+        unit: alert.unit,
+        active: alert.alertActive
+      };
+    }
+    if (acc[parameter]["min_value"] > alert.min_value) {
+      acc[parameter]["min_value"] = alert.min_value;
+    }
 
-      if (acc[parameter]["max_value"] < alert.max_value) {
-        acc[parameter]["max_value"] = alert.max_value;
-      }
+    if (acc[parameter]["currentMaxAlert"] > alert.currentMaxAlert) {
+      acc[parameter]["currentMaxAlert"] = alert.currentMaxAlert;
+    }
 
-      if (acc[parameter]["currentMaxAlert"] < alert.currentMaxAlert) {
-        acc[parameter]["currentMaxAlert"] = alert.currentMaxAlert;
-      }
+    if (acc[parameter]["max_value"] < alert.max_value) {
+      acc[parameter]["max_value"] = alert.max_value;
+    }
+
+    if (acc[parameter]["currentMaxAlert"] < alert.currentMaxAlert) {
+      acc[parameter]["currentMaxAlert"] = alert.currentMaxAlert;
     }
     return acc;
   }, {});
@@ -143,7 +142,6 @@ export const getOrganizedAdvisorySettings = (data) => {
 export const getOrganizedSensorData = (data, parameters) => {
   let seriesData = {};
   let latestData = {};
-  let deviceList = [];
   let dailyRainfall = 0;
   let currentDay = null;
   data.forEach(value => {
@@ -152,11 +150,6 @@ export const getOrganizedSensorData = (data, parameters) => {
     // For series data
     if (!seriesData[devEUI]) {
       seriesData[devEUI] = [];
-      // Added device as it is new device
-      deviceList.push({
-        "devName": devName,
-        "devEUI": devEUI
-      });
     }
     // For last 24 hours data
     if (!latestData[devEUI]) {
@@ -174,7 +167,7 @@ export const getOrganizedSensorData = (data, parameters) => {
       let fvalue = value[parameter] || null;
       switch (parameter) {
         case "rainfall_total":
-          if(fvalue != null ) {
+          if (fvalue != null) {
             let day = moment(value.Timestamp).format('YYYY-MM-DD');
             if (day !== currentDay) {
               dailyRainfall = 0;
@@ -202,8 +195,7 @@ export const getOrganizedSensorData = (data, parameters) => {
   });
   return {
     "seriesData": seriesData,
-    "latestData": latestData,
-    "deviceList": deviceList
+    "latestData": latestData
   }
 }
 
@@ -253,10 +245,57 @@ export const getAlertAdvisories = (settings, last24HoursData) => {
 export const calculateAvgLatestData = (latestData, parameter, selectedDevices) => {
   let total = 0, count = 0;
   Object.keys(latestData).forEach(devEUI => {
-    if (typeof (latestData[devEUI][parameter]) != "undefined" && latestData[devEUI][parameter] !=null && selectedDevices.includes(devEUI)) {
+    if (typeof (latestData[devEUI][parameter]) != "undefined" && latestData[devEUI][parameter] != null && selectedDevices.includes(devEUI)) {
       total += latestData[devEUI][parameter];
       count += 1;
     }
   });
   return (count > 0) ? Math.floor(total / count) : 0;
+}
+
+export const getOrganizedDevicesAverage = (parameters, selectedDevices, last24HoursData) => {
+
+  const organizedData = [];
+  Object.keys(parameters).forEach((key) => {
+    let param = parameters[key];
+    let { min_value, max_value, currentMinAlert, currentMaxAlert, parameter, paramDisplayName, unit } = param;
+    min_value = undefined;
+    // Find low thohresld and high thohresld
+    let low_thohresld = currentMinAlert ? (currentMinAlert < min_value ? min_value : currentMinAlert) : min_value;
+    let high_thohresld = currentMaxAlert ? (currentMaxAlert > max_value ? max_value * 0.7 : currentMaxAlert) : max_value * 0.7;
+    // Calculate average
+    let avg = calculateAvgLatestData(last24HoursData, parameter, selectedDevices);
+    if (!isValidatedAvgDevice(min_value, max_value, currentMinAlert, currentMaxAlert)) {
+        console.info(`[Utils][getOrganizedDevicesAverage] The ${parameter} is not considered for those value  min :${min_value} and max:${max_value} and low thohresld : ${low_thohresld} and high thohresld : ${high_thohresld}`);
+        return;
+    } 
+    organizedData.push({
+      min_value,
+      max_value,
+      low_thohresld,
+      high_thohresld,
+      parameter,
+      paramDisplayName,
+      unit,
+      avg
+    });
+  });
+  return organizedData;
+
+}
+
+export const isValidatedAvgDevice = (min_value, max_value, currentMinAlert, currentMaxAlert) => {
+  let flag = true;
+  if((typeof(min_value)== "undefined" && typeof(max_value) == "undefined") || typeof(max_value) == "undefined") {
+    flag = false;
+  } else if (max_value <= min_value) {
+    flag = false;
+  } else if (min_value > currentMinAlert) {
+    flag = false;
+  } else if (max_value < currentMaxAlert) {
+    flag = false;
+  } else if (currentMinAlert > currentMaxAlert) {
+    flag = false;
+  }
+  return flag;
 }

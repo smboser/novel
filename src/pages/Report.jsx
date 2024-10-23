@@ -4,7 +4,7 @@ import { CirclesWithBar } from "react-loader-spinner";
 import "react-multi-carousel/lib/styles.css";
 import { useAuth } from "../hooks/useAuth";
 import { APP_CONST } from "../helper/application-constant";
-import { getSensorData, getAdvisorySettings } from "../helper/web-service";
+import { getDevices, getSensorData, getAdvisorySettings } from "../helper/web-service";
 import { Navbar } from "../components/nav";
 import { Footer } from "../components/footer";
 import { AvgParameters } from "../components/avg_parameters";
@@ -32,23 +32,30 @@ export const ReportPage = () => {
 
         // Call the api for getAdvisorySettingData and getSensorData
         Promise.all([
+            getDevices(user),
             getAdvisorySettings(user),  // Call API to get advisory setting
             getSensorData(user)         // Call API to get sensor data
         ]).then((reponses) => {
             console.log(" ---- ALL DAta Fetching ----")
+            // Organized devices
+            let repDevices = reponses[0]["value"];
+            let deviceList = repDevices.map((device) => { 
+                let {devName, devEUI} = device;
+                return { devName, devEUI };
+            });
+            console.log("DeviceList:", deviceList);
             // Organized parameters
-            let repAdvisorySettings = reponses[0]["value"];
+            let repAdvisorySettings = reponses[1]["value"];
             let parameters = getOrganizedParameters(repAdvisorySettings);
             console.log("Organized Parameters:", parameters);
             let organizedAdvisorySettings = getOrganizedAdvisorySettings(repAdvisorySettings);
-            console.log("Organized Advisory Settings:", organizedAdvisorySettings)
+            console.log("Organized Advisory Settings:", organizedAdvisorySettings);
 
             // Organized sensor data
-            let repSensorData = reponses[1]["value"];
-            let { seriesData, latestData, deviceList } = getOrganizedSensorData(repSensorData, Object.keys(parameters));
+            let repSensorData = reponses[2]["value"];
+            let { seriesData, latestData } = getOrganizedSensorData(repSensorData, Object.keys(parameters));
             console.log("Series Data:", seriesData);
             console.log("Latest Data:", latestData);
-            console.log("DeviceList:", deviceList);
 
             // Find the unique devices
             setSettings(organizedAdvisorySettings);
@@ -110,8 +117,8 @@ export const ReportPage = () => {
                             <div className="col-md-2 col-sm-3 col-xs-12">
                                 <h2 className="dev_ttlmain">Devices</h2>
                                 <div className="dbb chtbox">
-                                    <span className="label label-primary" style={{ "padding": "6px","cursor": "pointer"}} onClick={handleChecked}>Checked</span>
-                                    <span className="label label-primary" style={{ "padding": "6px","cursor": "pointer", "marginLeft": "10px" }} onClick={handleUnchecked}>Unchecked</span>
+                                    <span className="label label-primary" style={{ "padding": "6px", "cursor": "pointer" }} onClick={handleChecked}>Checked</span>
+                                    <span className="label label-primary" style={{ "padding": "6px", "cursor": "pointer", "marginLeft": "10px" }} onClick={handleUnchecked}>Unchecked</span>
                                     <div className="list">
                                         {
                                             (devices.length > 0)

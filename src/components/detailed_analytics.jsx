@@ -32,8 +32,12 @@ export const DetailedAnalytics = ({ parameters, devices, selectedDevices, series
             if (!selectedDevices.includes(device.devEUI)) {
                 return;
             }
-            // Get the data for device
+            // Fetching data from series Array based on devEUI and If data is undefined or null then return
             let data = series[device.devEUI];
+            if(typeof (data) == "undefined" || data == null) {
+               return;
+            }
+            // Lopping the data
             data.forEach(s => {
                 let cdt = moment(s.timestamp);
                 let yval = s[selectedParam];
