@@ -253,7 +253,7 @@ export const getAlertAdvisories = (settings, last24HoursData) => {
 export const calculateAvgLatestData = (latestData, parameter, selectedDevices) => {
   let total = 0, count = 0;
   Object.keys(latestData).forEach(devEUI => {
-    if (typeof (latestData[devEUI][parameter]) != "undefined" && selectedDevices.includes(devEUI)) {
+    if (typeof (latestData[devEUI][parameter]) != "undefined" && latestData[devEUI][parameter] !=null && selectedDevices.includes(devEUI)) {
       total += latestData[devEUI][parameter];
       count += 1;
     }
