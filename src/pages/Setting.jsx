@@ -29,6 +29,7 @@ export const SettingPage = () => {
   const [errors, setErrors] = useState({});
 
   const farmer_companies = APP_CONST.farmer_companies;
+  const testingUsers = APP_CONST.testingUsers;
   const orgName = user.orgName;
   // Fetch data inside the component
   const fetchAlertData = async () => {
@@ -562,7 +563,8 @@ export const SettingPage = () => {
             </div>
           </div>
           <div className="col-md-12 col-sm-12 col-xs-12">
-            {farmer_companies.includes(orgName) ? (
+            {farmer_companies.includes(orgName) ||
+            testingUsers.includes(orgName) ? (
               <div className="col-md-12 col-sm-12 col-xs-12">
                 <SwitchComponent />
               </div>

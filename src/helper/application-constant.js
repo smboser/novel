@@ -5,6 +5,7 @@ export const APP_CONST = {
   SV: "1.0",
   default_parameter: "temperature",
   farmer_companies: ["JoeFarm", "FieldSolutions"],
+  testingUsers: ["DeepTesting"],
   alert_advisories_responsive_parameter: {
     superLargeDesktop: {
       breakpoint: { max: 4000, min: 3000 },
