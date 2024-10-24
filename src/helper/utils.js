@@ -133,7 +133,8 @@ export const getOrganizedAdvisorySettings = (data) => {
       parameter: dt.parameter,
       orgName: dt.orgName,
       paramDisplayName: dt.paramDisplayName,
-      repeatedAlert: dt.repeatedAlert
+      repeatedAlert: dt.repeatedAlert,
+      unit: dt.unit
     });
   });
   return organizedData;
@@ -144,6 +145,7 @@ export const getOrganizedSensorData = (data, parameters) => {
   let latestData = {};
   let dailyRainfall = 0;
   let currentDay = null;
+  let timeBefore24Hour = moment().add(-24, 'hours');
   data.forEach(value => {
     let devName = value.devName;
     let devEUI = value.devEUI;
@@ -187,10 +189,13 @@ export const getOrganizedSensorData = (data, parameters) => {
     // Push into series data array
     seriesData[devEUI].push(instData);
     // Push into last 24 hours data
-    if (Object.keys(latestData[devEUI]) == 0) {
-      latestData[devEUI] = instData;
-    } else if (new Date(value.Timestamp) > new Date(latestData[devEUI].timestamp)) {
-      latestData[devEUI] = instData;
+    let tm = moment(value.Timestamp);
+    if (tm.diff(timeBefore24Hour, 'seconds') > 0) {
+      if (Object.keys(latestData[devEUI]) == 0) {
+        latestData[devEUI] = instData;
+      } else if (new Date(value.Timestamp) > new Date(latestData[devEUI].timestamp)) {
+        latestData[devEUI] = instData;
+      }
     }
   });
   return {
@@ -212,7 +217,7 @@ export const getAlertAdvisories = (settings, last24HoursData) => {
       let curval = last24HoursData[devEUI][parameter];
       let devName = last24HoursData[devEUI]["devName"];
       // For exceeded
-      if (typeof (currentMaxAlert) != "undefined" && currentMaxAlert && curval > currentMaxAlert) {
+      if (typeof (currentMaxAlert) != "undefined" && currentMaxAlert && (curval != null && curval > currentMaxAlert)) {
         let altdata = {
           "devName": devName,
           "parameter": parameter,
@@ -225,7 +230,7 @@ export const getAlertAdvisories = (settings, last24HoursData) => {
       }
 
       // For subceeded
-      if (typeof (currentMinAlert) != "undefined" && currentMinAlert && curval < currentMinAlert) {
+      if (typeof (currentMinAlert) != "undefined" && currentMinAlert && (curval != null && curval < currentMinAlert)) {
         let altdata = {
           "devName": devName,
           "parameter": parameter,
@@ -259,16 +264,15 @@ export const getOrganizedDevicesAverage = (parameters, selectedDevices, last24Ho
   Object.keys(parameters).forEach((key) => {
     let param = parameters[key];
     let { min_value, max_value, currentMinAlert, currentMaxAlert, parameter, paramDisplayName, unit } = param;
-    min_value = undefined;
     // Find low thohresld and high thohresld
     let low_thohresld = currentMinAlert ? (currentMinAlert < min_value ? min_value : currentMinAlert) : min_value;
     let high_thohresld = currentMaxAlert ? (currentMaxAlert > max_value ? max_value * 0.7 : currentMaxAlert) : max_value * 0.7;
     // Calculate average
     let avg = calculateAvgLatestData(last24HoursData, parameter, selectedDevices);
     if (!isValidatedAvgDevice(min_value, max_value, currentMinAlert, currentMaxAlert)) {
-        console.info(`[Utils][getOrganizedDevicesAverage] The ${parameter} is not considered for those value  min :${min_value} and max:${max_value} and low thohresld : ${low_thohresld} and high thohresld : ${high_thohresld}`);
-        return;
-    } 
+      console.info(`[Utils][getOrganizedDevicesAverage] The ${parameter} is not considered for those value  min :${min_value} and max:${max_value} and low thohresld : ${low_thohresld} and high thohresld : ${high_thohresld}`);
+      return;
+    }
     organizedData.push({
       min_value,
       max_value,
@@ -286,7 +290,7 @@ export const getOrganizedDevicesAverage = (parameters, selectedDevices, last24Ho
 
 export const isValidatedAvgDevice = (min_value, max_value, currentMinAlert, currentMaxAlert) => {
   let flag = true;
-  if((typeof(min_value)== "undefined" && typeof(max_value) == "undefined") || typeof(max_value) == "undefined") {
+  if ((typeof (min_value) == "undefined" && typeof (max_value) == "undefined") || typeof (max_value) == "undefined") {
     flag = false;
   } else if (max_value <= min_value) {
     flag = false;
@@ -295,6 +299,10 @@ export const isValidatedAvgDevice = (min_value, max_value, currentMinAlert, curr
   } else if (max_value < currentMaxAlert) {
     flag = false;
   } else if (currentMinAlert > currentMaxAlert) {
+    flag = false;
+  } else if (currentMinAlert >= max_value) {
+    flag = false;
+  } else if (currentMaxAlert <= min_value) {
     flag = false;
   }
   return flag;
